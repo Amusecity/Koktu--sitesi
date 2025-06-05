@@ -41,6 +41,8 @@
     color: #0f0;
     font-size: 1.2em;
     line-height: 1.4em;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
   .terminal-box.red {
@@ -107,19 +109,18 @@
   const container = document.getElementById('container');
   const errorOverlay = document.getElementById('error-overlay');
 
-  // Yazılacak örnek 2000+ farklı satır örnek yazılar (virüs temalı)
+  // 2000 satırlık virüs temalı yazılar
   const messages = [];
   for(let i=0; i<2000; i++) {
     messages.push(
-      `[${i+1}] Virüs yükleniyor... Sistem çökmeye hazır!` +
-      `\nIP adresi tespit edildi: 192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}` +
-      `\nKişisel veriler siliniyor...` +
-      `\nHesap içi veriler ele geçirildi.` +
-      `\nSistem güvenliği yok!`
+      `[${i+1}] Virüs yükleniyor... Sistem çökmeye hazır!\n` +
+      `IP adresi tespit edildi: 192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}\n` +
+      `Kişisel veriler siliniyor...\n` +
+      `Hesap içi veriler ele geçirildi.\n` +
+      `Sistem güvenliği yok!\n`
     );
   }
 
-  // Kutular sıralı olarak yazı yazacak
   const boxes = [
     document.getElementById('box1'),
     document.getElementById('box2'),
@@ -127,67 +128,62 @@
     document.getElementById('box4')
   ];
 
-  let currentBoxIndex = 0;
-  let currentMsgIndex = 0;
-  let isRunning = false;
+  let currentMsgIndex = [0,0,0,0]; // Her kutunun ayrı mesaj indeksi
+  let writtenCount = [0,0,0,0];    // Her kutunun kaç yazı yazdığı
+  const maxLines = 1000;           // Her kutu 1000 yazı yazacak
+  const startNextAt = 50;          // Her kutu 50 yazıdan sonra diğer kutu başlasın
 
-  // Yavaş yazma fonksiyonu, her karakter 15ms
-  function typeMessage(box, message, callback) {
+  let startedBoxes = [false,false,false,false];
+
+  function typeMessage(boxIndex, message, callback) {
+    const box = boxes[boxIndex];
     let i = 0;
-    box.textContent = '';
-    const interval = setInterval(() => {
-      box.textContent += message.charAt(i);
-      i++;
-      if(i >= message.length) {
-        clearInterval(interval);
+    function typeChar() {
+      if(i < message.length) {
+        box.textContent += message.charAt(i);
+        i++;
+        setTimeout(typeChar, 8);  // Hız artırıldı: 8 ms / karakter
+      } else {
         callback();
       }
-    }, 15);
+    }
+    typeChar();
   }
 
-  function startSequence() {
-    isRunning = true;
-    container.style.display = 'grid';
-    startBtn.style.display = 'none';
-    runBox(currentBoxIndex);
+  function startBox(boxIndex) {
+    if(boxIndex > 3) return;
+    if(startedBoxes[boxIndex]) return; // zaten başlamış
+    startedBoxes[boxIndex] = true;
+    writeNextLine(boxIndex);
   }
 
-  function runBox(boxIndex) {
-    if(boxIndex >= boxes.length) {
-      showError();
+  function writeNextLine(boxIndex) {
+    if(currentMsgIndex[boxIndex] >= maxLines) {
+      // Bu kutu tamamlandı, kontrol hata gösterimi
+      if(boxIndex === 3) {
+        showError();
+      }
       return;
     }
 
-    let messagesToWrite = 1000; // Her kutu 1000 yazı yazacak
-    let written = 0;
+    const message = messages[currentMsgIndex[boxIndex]];
+    typeMessage(boxIndex, message, () => {
+      currentMsgIndex[boxIndex]++;
+      writtenCount[boxIndex]++;
 
-    function writeNext() {
-      if(written >= messagesToWrite) {
-        currentBoxIndex++;
-        runBox(currentBoxIndex);
+      // 50 yazı sonrası diğer kutu başlat
+      if(writtenCount[boxIndex] === startNextAt && boxIndex < 3) {
+        startBox(boxIndex + 1);
+      }
+
+      // Son kutu 1000 satır yazınca hata göster
+      if(boxIndex === 3 && writtenCount[boxIndex] >= maxLines) {
+        showError();
         return;
       }
-      typeMessage(boxes[boxIndex], messages[currentMsgIndex], () => {
-        written++;
-        currentMsgIndex++;
-        if(boxIndex === 3 && written >= messagesToWrite) {
-          showError();
-          return;
-        }
-        if(boxIndex === 0 && written === 20) {
-          // İkinci kutu başlasın
-          runBox(1);
-        }
-        if(boxIndex === 1 && written === 20) {
-          runBox(2);
-        }
-        if(boxIndex === 2 && written === 20) {
-          runBox(3);
-        }
-        writeNext();
-      });
-    }
-    writeNext();
+
+      writeNextLine(boxIndex);
+    });
   }
 
   function showError() {
@@ -195,10 +191,11 @@
   }
 
   startBtn.addEventListener('click', () => {
-    if(!isRunning) {
-      startSequence();
-    }
+    startBtn.style.display = 'none';
+    container.style.display = 'grid';
+    startBox(0); // İlk kutu başlasın
   });
+
 </script>
 </body>
 </html>
