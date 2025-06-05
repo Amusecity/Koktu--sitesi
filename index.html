@@ -7,117 +7,85 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
-  html, body {
+  body, html {
     margin: 0; padding: 0;
     height: 100%;
     background: black;
-    font-family: 'Share Tech Mono', monospace;
     overflow: hidden;
-  }
-
-  #startBtn {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 3em;
-    background: darkred;
-    color: #ff0000;
-    border: 3px solid #ff0000;
-    padding: 20px 60px;
-    cursor: pointer;
-    border-radius: 15px;
-    box-shadow: 0 0 20px #ff0000;
-    user-select: none;
-    transition: background-color 0.3s ease;
-  }
-  #startBtn:hover {
-    background-color: red;
+    font-family: 'Share Tech Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #0f0;
   }
 
   #container {
-    display: none;
-    height: 100vh;
-    width: 100vw;
-    padding: 15px;
-    box-sizing: border-box;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    gap: 15px;
+    gap: 20px;
+    width: 90vw;
+    height: 90vh;
+    max-width: 1200px;
+    max-height: 800px;
   }
 
-  .terminal {
-    background: #000;
+  .terminal-box {
+    background: black;
     border: 3px solid #0f0;
-    box-shadow:
-      0 0 15px #0f0 inset,
-      0 0 20px #0f0;
+    box-shadow: 0 0 20px #0f0;
     padding: 20px;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    font-size: 1.3em;
-    line-height: 1.2em;
-    color: #0f0;
     position: relative;
+    overflow-y: auto;
+    color: #0f0;
+    font-size: 1.2em;
+    line-height: 1.4em;
   }
 
-  .terminal.red {
-    border-color: #f00;
+  .terminal-box.red {
     color: #f00;
-    box-shadow:
-      0 0 15px #f00 inset,
-      0 0 30px #f00;
+    border-color: #f00;
+    box-shadow: 0 0 30px #f00;
   }
 
-  #errorBox {
-    display: none;
+  #error-overlay {
     position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.9);
     color: #f00;
     font-size: 6em;
-    font-weight: 900;
-    text-shadow:
-      0 0 15px #f00,
-      0 0 40px #f00,
-      0 0 70px #f00;
-    animation: blink 1s infinite alternate;
-    user-select: none;
-    pointer-events: none;
-    z-index: 9999;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 0 20px #f00;
+    visibility: hidden;
+    animation: blink 1s infinite;
+    z-index: 1000;
   }
 
   @keyframes blink {
     0%, 100% {opacity: 1;}
-    50% {opacity: 0.2;}
+    50% {opacity: 0;}
   }
 
-  .error-fly {
-    position: fixed;
+  #startBtn {
+    margin-top: 20px;
+    padding: 15px 40px;
     font-size: 1.5em;
+    background: #0f0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: black;
     font-weight: bold;
-    color: #f00;
-    text-shadow: 0 0 5px #f00;
     user-select: none;
-    pointer-events: none;
-    animation: flyIn 5s linear forwards;
-    opacity: 0;
+    transition: background 0.3s;
   }
 
-  @keyframes flyIn {
-    0% {
-      opacity: 0;
-      transform: translate(var(--x-start), var(--y-start)) scale(0.5);
-    }
-    50% {
-      opacity: 1;
-      transform: translate(calc(var(--x-start) / 2), calc(var(--y-start) / 2)) scale(1);
-    }
-    100% {
-      opacity: 1;
-      transform: translate(0, 0) scale(1);
-    }
+  #startBtn:hover {
+    background: #0a0;
   }
 </style>
 </head>
@@ -125,123 +93,112 @@
 
 <button id="startBtn">Çıkış</button>
 
-<div id="container">
-  <div class="terminal" id="term1"></div>
-  <div class="terminal red" id="term2"></div>
-  <div class="terminal" id="term3"></div>
-  <div class="terminal red" id="term4"></div>
+<div id="container" style="display:none;">
+  <div id="box1" class="terminal-box"></div>
+  <div id="box2" class="terminal-box red"></div>
+  <div id="box3" class="terminal-box"></div>
+  <div id="box4" class="terminal-box red"></div>
 </div>
 
-<div id="errorBox">ERROR</div>
+<div id="error-overlay">ERROR</div>
 
 <script>
   const startBtn = document.getElementById('startBtn');
   const container = document.getElementById('container');
-  const errorBox = document.getElementById('errorBox');
-  const terminals = [
-    document.getElementById('term1'),
-    document.getElementById('term2'),
-    document.getElementById('term3'),
-    document.getElementById('term4')
-  ];
+  const errorOverlay = document.getElementById('error-overlay');
 
-  const greenTexts = [
-    "VIRUS YÜKLENİYOR...",
-    "HESAP İÇİ VERİLER SİLİNİYOR...",
-    "IP ADRESİ BULUNUYOR...",
-    "ŞİFRELER ELE GEÇİRİLİYOR...",
-    "SİSTEME GİRİŞ SAĞLANDI...",
-    "VERİLER ÇALINIYOR...",
-    "FİREWALL DEVRE DIŞI...",
-    "KORUMA SİSTEMİ KAPANDI...",
-    "HESAP DURUMU: TEHLİKEDE",
-    "SİSTEM ÇÖKÜYOR..."
-  ];
-
-  const redTexts = [
-    "CRITICAL ERROR DETECTED...",
-    "SİSTEM ÇÖKÜYOR...",
-    "VERİLER KAYBOLDU...",
-    "KORUMA SİSTEMİ YOK EDİLDİ...",
-    "HESAP İÇİ VERİLERİN TAMAMI SİLİNDİ...",
-    "IP ADRESİ ELE GEÇİRİLDİ...",
-    "SİSTEME KIRMIZI ALARM VERİLDİ...",
-    "SİSTEM SALDIRI ALTINDA...",
-    "KULLANICI BLOKLANDI...",
-    "ERROR 0x000F!"
-  ];
-
-  function randomFrom(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+  // Yazılacak örnek 2000+ farklı satır örnek yazılar (virüs temalı)
+  const messages = [];
+  for(let i=0; i<2000; i++) {
+    messages.push(
+      `[${i+1}] Virüs yükleniyor... Sistem çökmeye hazır!` +
+      `\nIP adresi tespit edildi: 192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}` +
+      `\nKişisel veriler siliniyor...` +
+      `\nHesap içi veriler ele geçirildi.` +
+      `\nSistem güvenliği yok!`
+    );
   }
 
-  // Yazı hız ayarı (ms)
-  const typingDelay = 20;
+  // Kutular sıralı olarak yazı yazacak
+  const boxes = [
+    document.getElementById('box1'),
+    document.getElementById('box2'),
+    document.getElementById('box3'),
+    document.getElementById('box4')
+  ];
 
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+  let currentBoxIndex = 0;
+  let currentMsgIndex = 0;
+  let isRunning = false;
 
-  async function writeLine(term, line) {
-    for(let i=0; i < line.length; i++) {
-      term.textContent += line.charAt(i);
-      await sleep(typingDelay);
-    }
-    term.textContent += "\n";
-  }
-
-  async function run() {
-    startBtn.style.display = 'none';
-    container.style.display = 'grid';
-
-    // Her terminal için 1000 yazı yaz, terminal 2 ve 4 kırmızı metinlerle
-    for(let i = 0; i < 1000; i++) {
-      for(let t=0; t < terminals.length; t++) {
-        let line;
-        if(t % 2 === 0) {
-          line = randomFrom(greenTexts);
-          terminals[t].style.color = '#0f0';
-          terminals[t].style.borderColor = '#0f0';
-          terminals[t].style.boxShadow = '0 0 15px #0f0 inset, 0 0 20px #0f0';
-        } else {
-          line = randomFrom(redTexts);
-          terminals[t].style.color = '#f00';
-          terminals[t].style.borderColor = '#f00';
-          terminals[t].style.boxShadow = '0 0 15px #f00 inset, 0 0 30px #f00';
-        }
-        await writeLine(terminals[t], line);
+  // Yavaş yazma fonksiyonu, her karakter 15ms
+  function typeMessage(box, message, callback) {
+    let i = 0;
+    box.textContent = '';
+    const interval = setInterval(() => {
+      box.textContent += message.charAt(i);
+      i++;
+      if(i >= message.length) {
+        clearInterval(interval);
+        callback();
       }
-    }
-
-    // Hata mesajı göster ve yanıp sönen efekt başlat
-    errorBox.style.display = 'block';
-
-    // Ekranın 4 tarafından rastgele ERROR yazıları uçuşuyor
-    createFlyingErrors(20);
+    }, 15);
   }
 
-  function createFlyingErrors(count) {
-    for(let i=0; i < count; i++) {
-      const errorEl = document.createElement('div');
-      errorEl.classList.add('error-fly');
-      errorEl.textContent = 'ERROR';
+  function startSequence() {
+    isRunning = true;
+    container.style.display = 'grid';
+    startBtn.style.display = 'none';
+    runBox(currentBoxIndex);
+  }
 
-      // Rastgele başlangıç konumu (üst, alt, sağ, sol)
-      const side = Math.floor(Math.random() * 4);
-      let xStart, yStart;
+  function runBox(boxIndex) {
+    if(boxIndex >= boxes.length) {
+      showError();
+      return;
+    }
 
-      switch(side) {
-        case 0: // üst
-          xStart = Math.random() * window.innerWidth + 'px';
-          yStart = '-50px';
-          break;
-        case 1: // alt
-          xStart = Math.random() * window.innerWidth + 'px';
-          yStart = window.innerHeight + 50 + 'px';
-          break;
-        case 2: // sol
-          xStart = '-150px';
-          yStart = Math.random() * window.innerHeight + 'px';
-          break;
-        case 3: // sağ
-          xStart = window.innerWidth + 150 + '
+    let messagesToWrite = 1000; // Her kutu 1000 yazı yazacak
+    let written = 0;
+
+    function writeNext() {
+      if(written >= messagesToWrite) {
+        currentBoxIndex++;
+        runBox(currentBoxIndex);
+        return;
+      }
+      typeMessage(boxes[boxIndex], messages[currentMsgIndex], () => {
+        written++;
+        currentMsgIndex++;
+        if(boxIndex === 3 && written >= messagesToWrite) {
+          showError();
+          return;
+        }
+        if(boxIndex === 0 && written === 20) {
+          // İkinci kutu başlasın
+          runBox(1);
+        }
+        if(boxIndex === 1 && written === 20) {
+          runBox(2);
+        }
+        if(boxIndex === 2 && written === 20) {
+          runBox(3);
+        }
+        writeNext();
+      });
+    }
+    writeNext();
+  }
+
+  function showError() {
+    errorOverlay.style.visibility = 'visible';
+  }
+
+  startBtn.addEventListener('click', () => {
+    if(!isRunning) {
+      startSequence();
+    }
+  });
+</script>
+</body>
+</html>
