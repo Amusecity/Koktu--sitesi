@@ -2,169 +2,142 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SYSTEM BREACH</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Şaka Terminal</title>
   <style>
-    * {
+    body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-    html, body {
-      width: 100%;
-      height: 100%;
       background-color: black;
-      color: #00ff00;
       font-family: 'Courier New', monospace;
+      color: #00ff00;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
       overflow: hidden;
     }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      width: 100vw;
-      height: 100vh;
-      padding: 20px;
-      gap: 10px;
-      justify-content: center;
-      align-items: center;
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 20px;
+      width: 90%;
+      height: 80%;
     }
     .terminal {
-      background-color: black;
+      background-color: #000;
       border: 2px solid #00ff00;
       padding: 10px;
-      width: 45vw;
-      height: 45vh;
-      overflow-y: auto;
-      white-space: pre-wrap;
       box-shadow: 0 0 10px #00ff00;
-      font-size: 0.9em;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      font-size: 1em;
     }
-    .error-box {
-      position: fixed;
+    .output {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .center-error {
+      position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      padding: 40px;
-      background-color: red;
-      color: white;
-      font-size: 2em;
-      font-weight: bold;
+      font-size: 3em;
+      color: red;
       display: none;
-      animation: blink 0.6s infinite alternate;
-      box-shadow: 0 0 20px red;
-      z-index: 999;
+      animation: blink 1s infinite;
     }
     @keyframes blink {
-      0% { opacity: 0.1; }
+      0% { opacity: 1; }
+      50% { opacity: 0; }
       100% { opacity: 1; }
     }
-    #startBtn {
+    button {
       position: absolute;
       bottom: 30px;
-      right: 30px;
-      padding: 15px 30px;
       font-size: 1.5em;
-      background-color: red;
+      padding: 10px 20px;
+      background: red;
       color: white;
       border: none;
-      border-radius: 6px;
       cursor: pointer;
-      z-index: 999;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="terminal" id="term1"></div>
-    <div class="terminal" id="term2"></div>
-    <div class="terminal" id="term3"></div>
-    <div class="terminal" id="term4"></div>
+  <div class="grid">
+    <div class="terminal"><div class="output" id="term1"></div></div>
+    <div class="terminal"><div class="output" id="term2"></div></div>
+    <div class="terminal"><div class="output" id="term3"></div></div>
+    <div class="terminal"><div class="output" id="term4"></div></div>
   </div>
 
-  <div id="errorBox" class="error-box">!!! ERROR !!!</div>
   <button id="startBtn">Çıkış</button>
-
-  <audio id="alarmSound" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_ef2c2ba9a1.mp3?filename=distorted-signal-101379.mp3" loop></audio>
+  <div class="center-error" id="errorText">ERROR</div>
 
   <script>
-    const logs = [
-      "[*] Sistem taranıyor...",
-      "[*] Virüs tespit edildi...",
-      "[*] IP adresi bulunuyor...",
-      "[*] Root dizinine erişiliyor...",
-      "[*] Veriler çözümleniyor...",
-      "[*] Bellek sızıntısı tespit edildi...",
-      "[*] Kayıt defteri bozuldu...",
-      "[*] Dosya sistemi zarar görüyor...",
-      "[*] Geri dönüşüm kutusu boşaltılıyor...",
-      "[*] Hesap şifreleri çözümleniyor...",
-      "[*] Proxy tüneli devre dışı kaldı...",
-      "[*] Tor bağlantısı kesildi...",
-      "[*] Hedef sistem kilitleniyor...",
-      "[*] Ağ bağlantısı ele geçirildi...",
-      "[*] Kullanıcı oturumu klonlanıyor...",
+    const messages = [
+      "Virüs yükleniyor...",
+      "Sistem dosyaları siliniyor...",
+      "IP adresi izleniyor...",
+      "Kamera erişimi sağlandı...",
+      "Veriler sızdırılıyor...",
+      "Sistem çökertiliyor...",
+      "Şifre çözümleniyor...",
+      "Sistem uyarı veriyor...",
+      "Ağ izleniyor...",
+      "ROOT erişimi sağlandı..."
     ];
 
     const terminals = [
-      document.getElementById("term1"),
-      document.getElementById("term2"),
-      document.getElementById("term3"),
-      document.getElementById("term4")
+      document.getElementById('term1'),
+      document.getElementById('term2'),
+      document.getElementById('term3'),
+      document.getElementById('term4')
     ];
 
-    const delayBetweenBoxes = 20;
+    let counters = [0, 0, 0, 0];
     const maxLines = 1000;
-    const lineDelay = 20;
-    const errorBox = document.getElementById("errorBox");
-    const alarmSound = document.getElementById("alarmSound");
+    const delay = 30;
 
-    document.getElementById("startBtn").addEventListener("click", () => {
-      document.getElementById("startBtn").style.display = "none";
-      alarmSound.play().catch(console.error);
+    function writeToTerminal(index) {
+      if (counters[index] >= maxLines) return;
 
-      startTypingSequence();
+      const msg = messages[Math.floor(Math.random() * messages.length)];
+      terminals[index].textContent += `\n${msg}`;
+      counters[index]++;
+
+      // Otomatik scroll
+      terminals[index].scrollTop = terminals[index].scrollHeight;
+
+      // Diğer kutuların başlaması
+      if (index < 3 && counters[index] === 20) {
+        startTerminal(index + 1);
+      }
+
+      // ERROR gösterme
+      if (counters.every(c => c >= maxLines)) {
+        document.getElementById('errorText').style.display = 'block';
+      } else {
+        setTimeout(() => writeToTerminal(index), delay);
+      }
+    }
+
+    function startTerminal(index) {
+      writeToTerminal(index);
+    }
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      document.getElementById('startBtn').style.display = 'none';
+      startTerminal(0);
     });
-
-    function typeInBox(boxIndex, startAfter = 0) {
-      let lineCount = 0;
-      const box = terminals[boxIndex];
-      const interval = setInterval(() => {
-        if (lineCount >= maxLines) {
-          clearInterval(interval);
-          if (boxIndex === terminals.length - 1) showError();
-          return;
-        }
-        const randomLine = logs[Math.floor(Math.random() * logs.length)];
-        box.innerText += randomLine + "\n";
-        box.scrollTop = box.scrollHeight;
-        lineCount++;
-      }, lineDelay);
-    }
-
-    function startTypingSequence() {
-      terminals.forEach((_, i) => {
-        setTimeout(() => typeInBox(i), i * delayBetweenBoxes * lineDelay);
-      });
-    }
-
-    function showError() {
-      errorBox.style.display = "block";
-      document.body.insertAdjacentHTML("beforeend", `
-        <div style="
-          position: fixed;
-          top: 0; left: 0;
-          width: 100vw; height: 100vh;
-          background-color: black;
-          color: red;
-          font-size: 10vw;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          animation: blink 0.5s infinite alternate;
-          z-index: 998;
-        ">!!! ERROR !!!</div>
-      `);
-    }
   </script>
 </body>
 </html>
