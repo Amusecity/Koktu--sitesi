@@ -1,252 +1,151 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hacklenmiş Terminal</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+  <meta charset="UTF-8">
+  <title>Korku Terminali</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+    body {
+      margin: 0;
+      background: black;
+      color: #00ff00;
+      font-family: 'Share Tech Mono', monospace;
+      overflow: hidden;
+    }
 
-  body {
-    margin: 0;
-    height: 100vh;
-    background-color: black;
-    color: #00FF00;
-    font-family: 'Share Tech Mono', monospace;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    position: relative;
-  }
-  h1 {
-    color: red;
-    margin-bottom: 10px;
-  }
-  .top-row, .bottom-row {
-    display: flex;
-    gap: 20px;
-    width: 100%;
-    max-width: 1200px;
-    justify-content: center;
-  }
-  .terminal-box {
-    background: #010101;
-    border: 2px solid #00FF00;
-    box-shadow: 0 0 10px #00FF00;
-    padding: 15px;
-    width: 280px;
-    height: 200px;
-    overflow-y: auto;
-    position: relative;
-    font-size: 1em;
-    line-height: 1.2em;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-  #center-box {
-    background: #200000;
-    border: 3px solid red;
-    box-shadow: 0 0 20px red;
-    width: 300px;
-    height: 220px;
-    font-size: 2em;
-    font-weight: bold;
-    color: red;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    animation: blink 1s infinite;
-    user-select: none;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-  #mask {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 100px;
-    filter: drop-shadow(0 0 5px limegreen);
-    z-index: 9999;
-  }
-  button {
-    margin-top: 30px;
-    font-size: 1.5em;
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 12px 36px;
-    cursor: pointer;
-    border-radius: 8px;
-    user-select: none;
-    transition: background-color 0.3s;
-  }
-  button:hover:enabled {
-    background-color: darkred;
-  }
-  button:disabled {
-    background-color: grey;
-    cursor: default;
-  }
-</style>
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      gap: 10px;
+    }
+
+    .terminal {
+      background-color: #000;
+      border: 2px solid #00ff00;
+      padding: 10px;
+      width: 300px;
+      height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 0 20px #00ff00;
+      display: none;
+      position: relative;
+    }
+
+    #error-box {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: red;
+      color: white;
+      font-size: 2em;
+      padding: 20px 40px;
+      display: none;
+      animation: blink 0.5s infinite alternate;
+      z-index: 999;
+      box-shadow: 0 0 20px red;
+    }
+
+    @keyframes blink {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    #startBtn {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 30px;
+      font-size: 1.5em;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
-<h1>⚠️ SYSTEM BREACH DETECTED ⚠️</h1>
-<img id="mask" src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="Hack Mask Icon" />
-
-<div class="top-row">
-  <div class="terminal-box" id="box1"></div>
-  <div class="terminal-box" id="box2"></div>
+<div class="container">
+  <div class="terminal" id="terminal1"></div>
+  <div class="terminal" id="terminal2"></div>
+  <div class="terminal" id="terminal3"></div>
+  <div class="terminal" id="terminal4"></div>
 </div>
 
-<div id="center-box" style="margin: 25px 0;">!!! ERROR !!!</div>
-
-<div class="bottom-row">
-  <div class="terminal-box" id="box3"></div>
-  <div class="terminal-box" id="box4"></div>
-</div>
-
-<button id="toggleBtn">Başlat</button>
+<div id="error-box">⚠️ ERROR ⚠️</div>
+<button id="startBtn">Çıkış</button>
 
 <script>
-  const boxes = [
-    document.getElementById('box1'),
-    document.getElementById('box2'),
-    document.getElementById('box3'),
-    document.getElementById('box4')
+  const messages = [
+    "Virüs yükleniyor...",
+    "IP adresi bulunuyor...",
+    "Veriler siliniyor...",
+    "Dosya şifreleniyor...",
+    "Sistem çöküyor...",
+    "Gizli klasörler açılıyor...",
+    "Çekirdek erişimi elde edildi...",
+    "Root erişimi verildi...",
+    "Hesap verileri ele geçirildi...",
+    "Bilinmeyen işlem başlatıldı...",
+    "Firewall devre dışı bırakıldı...",
+    "Arka kapı açıldı...",
+    "Tüm mesajlar okunuyor...",
+    "Kamera erişimi alındı...",
+    "Mikrofon kaydı başladı...",
+    "Disk formatlanıyor...",
+    "RAM belleği aşırı kullanılıyor...",
+    "Veri tabanı bozuldu...",
+    "Sistem kaynakları çalınıyor...",
+    "IP adresi Çin'e yönlendiriliyor..."
   ];
 
-  const centerBox = document.getElementById('center-box');
-  centerBox.style.visibility = 'hidden'; // Başlangıçta gizli
-
-  const messagesPools = [
-    [
-      ">>> WARNING! VIRUS DETECTED IN SYSTEM <<<",
-      "[*] Attempting to contain threat...",
-      "[*] Virus spreading rapidly...",
-      "[*] SYSTEM COMPROMISED!",
-      ">>> ACCOUNT DATA LEAKED <<<",
-      "[*] User credentials being extracted...",
-      ">>> IP ADDRESS LOCATED: 192.168.1.10 <<<",
-      "[*] FIREWALL BREACHED!",
-      ">>> MALWARE INSTALLATION IN PROGRESS <<<",
-      "[*] Root access granted.",
-      ">>> DATABASE ENCRYPTION BROKEN <<<",
-      "[*] Backdoor installed.",
-      ">>> TROJAN ACTIVATED <<<",
-      "[*] SYSTEM INSTABILITY DETECTED...",
-      ">>> PASSWORDS DECRYPTED <<<",
-      ">>> NETWORK TRAFFIC INTERCEPTED <<<",
-      ">>> ALL DATA IS BEING ERASED <<<",
-      "[*] User session hijacked.",
-      ">>> SYSTEM FAILURE IMMINENT <<<",
-      "[*] Shutting down security protocols..."
-    ],
-    [
-      ">>> HACKER ACCESS GRANTED <<<",
-      "[*] Rootkit installed.",
-      "[*] Keylogger running silently...",
-      ">>> BRUTE FORCE ATTACK IN PROGRESS <<<",
-      "[*] Firewall bypassed.",
-      ">>> ENCRYPTION KEYS EXTRACTED <<<",
-      "[*] VPN disabled.",
-      ">>> SYSTEM FILES MODIFIED <<<",
-      "[*] Unauthorized access detected.",
-      ">>> RANSOMWARE DEPLOYED <<<",
-      "[*] System integrity compromised.",
-      ">>> PASSWORDS STORED IN CLEAR TEXT <<<",
-      "[*] SSH TUNNEL CREATED...",
-      ">>> DDOS ATTACK INITIATED <<<",
-      "[*] Data exfiltration ongoing.",
-      ">>> TROJAN HORSE INSTALLED <<<",
-      "[*] Logs deleted.",
-      ">>> NETWORK MAP ACQUIRED <<<",
-      "[*] SYSTEM MONITORING DISABLED...",
-      ">>> MALICIOUS SCRIPT EXECUTING..."
-    ],
-    [
-      ">>> SYSTEM VIRUS ACTIVATED <<<",
-      "[*] Trojan detected in memory.",
-      ">>> KEYLOGGER CAPTURING INPUTS <<<",
-      "[*] Backdoor open.",
-      ">>> FIREWALL RULES ALTERED <<<",
-      "[*] Malicious payload deployed.",
-      ">>> ADMIN CREDENTIALS COMPROMISED <<<",
-      "[*] Root access confirmed.",
-      ">>> MALWARE SPREADING FAST <<<",
-      "[*] Data wiped.",
-      ">>> SECURITY ALERT TRIGGERED <<<",
-      "[*] Network sniffing enabled.",
-      ">>> PHISHING ATTEMPT DETECTED <<<",
-      "[*] Malware signature updated.",
-      ">>> SYSTEM OVERLOAD <<<",
-      "[*] Antivirus disabled.",
-      ">>> REMOTE SHELL OPENED <<<",
-      "[*] Suspicious activity logged.",
-      ">>> SYSTEM CORRUPTION <<<",
-      "[*] Cleanup failed..."
-    ],
-    [
-      ">>> BREACH DETECTED <<<",
-      "[*] Suspicious process running.",
-      ">>> PRIVILEGE ESCALATION <<<",
-      "[*] Keylogger active.",
-      ">>> PASSWORD DATABASE EXTRACTED <<<",
-      "[*] Botnet command received.",
-      ">>> SYSTEM SHUTDOWN INITIATED <<<",
-      "[*] Unauthorized user logged in.",
-      ">>> FIREWALL DISABLED <<<",
-      "[*] Rootkit installed.",
-      ">>> DATABASE ENCRYPTION REMOVED <<<",
-      "[*] Malware beacon sent.",
-      ">>> NETWORK TRAFFIC MONITORED <<<",
-      "[*] Remote code execution.",
-      ">>> TROJAN INSTALLATION COMPLETE <<<",
-      "[*] Logs wiped.",
-      ">>> DATA LEAK IN PROGRESS <<<",
-      "[*] System rebooting...",
-      ">>> SYSTEM FAILURE DETECTED <<<"
-    ],
+  const terminals = [
+    document.getElementById('terminal1'),
+    document.getElementById('terminal2'),
+    document.getElementById('terminal3'),
+    document.getElementById('terminal4')
   ];
 
-  let linesWritten = [0, 0, 0, 0];
-  let intervalIds = [];
-  const maxLines = 2000;
-  const delay = 10; // ms per line - hızlı yazmak için
+  const errorBox = document.getElementById('error-box');
+  const startBtn = document.getElementById('startBtn');
+  let audio = new Audio('https://freesound.org/data/previews/456/456783_5121236-lq.mp3'); // korku sesi
 
-  function getRandomMessage(pool) {
-    return pool[Math.floor(Math.random() * pool.length)];
-  }
-
-  function typeLines(index) {
-    intervalIds[index] = setInterval(() => {
-      if(linesWritten[index] < maxLines) {
-        boxes[index].textContent += getRandomMessage(messagesPools[index]) + "\n";
-        boxes[index].scrollTop = boxes[index].scrollHeight;
-        linesWritten[index]++;
-      } else {
-        clearInterval(intervalIds[index]);
-        // Tüm kutular bitti mi kontrolü
-        if(intervalIds.every(id => id === undefined || !id)) {
-          showCenterBox();
-        }
+  function typeToTerminal(terminal, count, delay, onComplete) {
+    terminal.style.display = 'block';
+    let i = 0;
+    const interval = setInterval(() => {
+      const msg = messages[Math.floor(Math.random() * messages.length)];
+      terminal.innerHTML += msg + "<br>";
+      terminal.scrollTop = terminal.scrollHeight;
+      i++;
+      if (i >= count) {
+        clearInterval(interval);
+        if (onComplete) onComplete();
       }
     }, delay);
   }
 
-  function showCenterBox() {
-    centerBox.style.visibility = 'visible';
+  function startSequence() {
+    startBtn.style.display = 'none';
+    audio.loop = true;
+    audio.play().catch(e => console.log("Ses çalınamadı:", e));
+
+    typeToTerminal(terminals[0], 1000, 5, () => {});
+    setTimeout(() => typeToTerminal(terminals[1], 1000, 5, () => {}), 20 * 5);
+    setTimeout(() => typeToTerminal(terminals[2], 1000, 5, () => {}), 40 * 5);
+    setTimeout(() => typeToTerminal(terminals[3], 1000, 5, () => {
+      errorBox.style.display = 'block';
+    }), 60 * 5);
   }
 
-  function startAll() {
-    for(let i=0; i<boxes.length; i++) {
-      boxes[i].textContent = "";
-      linesWritten[i] = 0;
-      typeLines(i);
-    }
-    toggleBtn.disabled = true; // sadece bir kez basılabilir
-  }
+  startBtn.addEventListener('click', startSequence);
+</script>
+
+</body>
+</html>
