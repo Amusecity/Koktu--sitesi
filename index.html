@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Korku Sitesi - Kaotik Virüs Terminali</title>
+<title>Hacklenmiş Terminal</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
@@ -13,229 +13,160 @@
     background-color: black;
     color: #00FF00;
     font-family: 'Share Tech Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
     position: relative;
   }
   h1 {
     color: red;
-    font-size: 2.5em;
-    text-align: center;
-    margin: 10px 0;
-    user-select: none;
-    position: relative;
-    z-index: 1000;
+    margin-bottom: 10px;
   }
-
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+    gap: 20px;
+  }
+  .terminal-box {
+    background: #010101;
+    border: 2px solid #00FF00;
+    box-shadow: 0 0 10px #00FF00;
+    padding: 15px;
+    width: 280px;
+    height: 200px;
+    overflow-y: auto;
+    position: relative;
+  }
+  .terminal-box pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 1em;
+    line-height: 1.2em;
+  }
   #mask {
     position: fixed;
     top: 20px;
     right: 20px;
-    width: 200px;
-    filter: drop-shadow(0 0 10px red);
-    user-select: none;
-    z-index: 999;
+    width: 100px;
+    filter: drop-shadow(0 0 5px limegreen);
+    z-index: 9999;
   }
-
-  .text-box {
-    position: fixed;
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #00FF00;
-    padding: 10px 15px;
-    font-size: 1.1em;
-    white-space: nowrap;
-    box-shadow: 0 0 10px #00FF00;
-    pointer-events: none;
-    font-weight: bold;
-    text-shadow: 0 0 4px #00FF00;
-    user-select: none;
-  }
-
-  #error {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 8em;
-    color: red;
-    font-weight: bold;
-    text-shadow: 0 0 40px red;
-    display: none;
-    animation: blink 1s infinite alternate;
-    pointer-events: none;
-    z-index: 2000;
-    user-select: none;
-  }
-
-  @keyframes blink {
-    0% {opacity: 1;}
-    100% {opacity: 0;}
-  }
-
-  #startBtn {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 15px 40px;
+  button {
+    margin-top: 30px;
     font-size: 1.5em;
-    background: red;
-    border: none;
-    border-radius: 10px;
+    background-color: red;
     color: white;
+    border: none;
+    padding: 12px 36px;
     cursor: pointer;
+    border-radius: 8px;
     user-select: none;
-    z-index: 1000;
     transition: background-color 0.3s;
   }
-  #startBtn:hover:enabled {
-    background: darkred;
-  }
-  #startBtn:disabled {
-    background: #800000;
-    cursor: default;
+  button:hover {
+    background-color: darkred;
   }
 </style>
 </head>
 <body>
 
 <h1>⚠️ SYSTEM BREACH DETECTED ⚠️</h1>
+<img id="mask" src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="Hack Mask Icon" />
 
-<img id="mask" src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Mask Icon" />
+<div class="container">
+  <div class="terminal-box" id="box1"><pre></pre></div>
+  <div class="terminal-box" id="box2"><pre></pre></div>
+  <div class="terminal-box" id="box3"><pre></pre></div>
+  <div class="terminal-box" id="box4"><pre></pre></div>
+  <div class="terminal-box" id="box5"><pre></pre></div>
+</div>
 
-<div id="error">ERROR</div>
-
-<button id="startBtn">Başlat</button>
+<button id="toggleBtn">Başlat</button>
 
 <script>
-  const virusMessages = [
-    "Virüs yükleniyor...",
-    "Hesap içi veriler siliniyor...",
-    "IP adresi bulunuyor...",
-    "Sistem dosyaları zarar görüyor...",
-    "Şifreler kırılıyor...",
-    "Gizli bilgiler çalınıyor...",
-    "RAM doluyor...",
-    "Arka kapı açılıyor...",
-    "Sistem kapanıyor...",
-    "Yetkisiz erişim tespit edildi...",
-    "Dosyalar şifreleniyor...",
-    "Veri tabanı bozuluyor...",
-    "Firewall devre dışı bırakılıyor...",
-    "Trojan aktif hale getiriliyor...",
-    "Payload yüklendi...",
-    "Kötü amaçlı komut çalıştırılıyor...",
-    "Sistem kayıtları siliniyor...",
-    "Kullanıcı hesapları ele geçiriliyor...",
-    "Şifre kurtarılıyor...",
-    "Veriler uzaktan erişiliyor..."
+  const boxes = [
+    document.querySelector('#box1 pre'),
+    document.querySelector('#box2 pre'),
+    document.querySelector('#box3 pre'),
+    document.querySelector('#box4 pre'),
+    document.querySelector('#box5 pre')
   ];
 
-  const boxCount = 30;
-  const directions = ['leftToRight', 'rightToLeft', 'topToBottom', 'bottomToTop'];
-  let boxes = [];
+  const messages = [
+    ">>> WARNING! VIRUS DETECTED IN SYSTEM <<<",
+    "[*] Attempting to contain threat...",
+    "[*] Virus spreading rapidly...",
+    "[*] SYSTEM COMPROMISED!",
+    ">>> ACCOUNT DATA LEAKED <<<",
+    "[*] User credentials being extracted...",
+    ">>> IP ADDRESS LOCATED: 192.168.1.10 <<<",
+    "[*] FIREWALL BREACHED!",
+    ">>> MALWARE INSTALLATION IN PROGRESS <<<",
+    "[*] Root access granted.",
+    ">>> DATABASE ENCRYPTION BROKEN <<<",
+    "[*] Backdoor installed.",
+    ">>> TROJAN ACTIVATED <<<",
+    "[*] SYSTEM INSTABILITY DETECTED...",
+    ">>> PASSWORDS DECRYPTED <<<",
+    ">>> NETWORK TRAFFIC INTERCEPTED <<<",
+    ">>> ALL DATA IS BEING ERASED <<<",
+    "[*] User session hijacked.",
+    ">>> SYSTEM FAILURE IMMINENT <<<",
+    "[*] Shutting down security protocols..."
+  ];
+
+  let intervalIds = [];
   let running = false;
 
-  const audio = new Audio('https://www.soundjay.com/horror/sounds/horror-sound-1.mp3');
-  audio.loop = true;
-  audio.volume = 1;
-
-  function randomChoice(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+  function randomMessage() {
+    return messages[Math.floor(Math.random() * messages.length)];
   }
 
-  function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  function createBoxes() {
-    for(let i=0; i < boxCount; i++) {
-      const box = document.createElement('div');
-      box.className = 'text-box';
-
-      box.textContent = virusMessages[randomInt(0, virusMessages.length -1)];
-
-      const dir = randomChoice(directions);
-      box.dataset.direction = dir;
-
-      box.dataset.speed = (randomInt(1, 4) / 2).toFixed(2);
-
-      if(dir === 'leftToRight') {
-        box.style.top = randomInt(0, window.innerHeight - 40) + 'px';
-        box.style.left = '-300px';
-      } else if(dir === 'rightToLeft') {
-        box.style.top = randomInt(0, window.innerHeight - 40) + 'px';
-        box.style.left = window.innerWidth + 'px';
-      } else if(dir === 'topToBottom') {
-        box.style.left = randomInt(0, window.innerWidth - 300) + 'px';
-        box.style.top = '-40px';
-      } else if(dir === 'bottomToTop') {
-        box.style.left = randomInt(0, window.innerWidth - 300) + 'px';
-        box.style.top = window.innerHeight + 'px';
-      }
-
-      document.body.appendChild(box);
-      boxes.push(box);
+  function startTyping() {
+    running = true;
+    for(let i=0; i < boxes.length; i++) {
+      boxes[i].textContent = "";
+      let count = 0;
+      intervalIds[i] = setInterval(() => {
+        if (count < 2000) {
+          boxes[i].textContent += randomMessage() + "\n";
+          boxes[i].scrollTop = boxes[i].scrollHeight;
+          count++;
+        } else {
+          boxes[i].textContent += "\n!!! ERROR !!!\n";
+          boxes[i].style.color = "red";
+          clearInterval(intervalIds[i]);
+        }
+      }, 30);
     }
   }
 
-  function animate() {
-    if (!running) return;
-
+  function stopTyping() {
+    running = false;
+    intervalIds.forEach(id => clearInterval(id));
     boxes.forEach(box => {
-      let speed = parseFloat(box.dataset.speed);
-      let dir = box.dataset.direction;
-
-      let top = parseFloat(box.style.top);
-      let left = parseFloat(box.style.left);
-
-      if (dir === 'leftToRight') {
-        left += speed;
-        if (left > window.innerWidth) {
-          left = -box.offsetWidth;
-          box.textContent = virusMessages[randomInt(0, virusMessages.length -1)];
-          top = randomInt(0, window.innerHeight - 40);
-        }
-      } else if (dir === 'rightToLeft') {
-        left -= speed;
-        if (left + box.offsetWidth < 0) {
-          left = window.innerWidth;
-          box.textContent = virusMessages[randomInt(0, virusMessages.length -1)];
-          top = randomInt(0, window.innerHeight - 40);
-        }
-      } else if (dir === 'topToBottom') {
-        top += speed;
-        if (top > window.innerHeight) {
-          top = -box.offsetHeight;
-          box.textContent = virusMessages[randomInt(0, virusMessages.length -1)];
-          left = randomInt(0, window.innerWidth - 300);
-        }
-      } else if (dir === 'bottomToTop') {
-        top -= speed;
-        if (top + box.offsetHeight < 0) {
-          top = window.innerHeight;
-          box.textContent = virusMessages[randomInt(0, virusMessages.length -1)];
-          left = randomInt(0, window.innerWidth - 300);
-        }
-      }
-
-      box.style.top = top + 'px';
-      box.style.left = left + 'px';
+      box.textContent = "";
+      box.style.color = "#00FF00";
     });
-
-    requestAnimationFrame(animate);
   }
 
-  function start() {
-    if (running) return;  // İkinci kez basmayı engelle
-
-    running = true;
-    createBoxes();
-    audio.play().catch(e => console.log("Ses çalınamadı:", e));
-    document.getElementById('startBtn').disabled = true;  // Butonu devre dışı bırak
-    animate();
-  }
-
-  document.getElementById('startBtn').addEventListener('click', start);
+  const toggleBtn = document.getElementById('toggleBtn');
+  toggleBtn.addEventListener('click', () => {
+    if (!running) {
+      startTyping();
+      toggleBtn.textContent = "Çıkış";
+    } else {
+      stopTyping();
+      toggleBtn.textContent = "Başlat";
+    }
+  });
 </script>
+
 </body>
 </html>
