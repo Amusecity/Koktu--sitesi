@@ -97,13 +97,8 @@
     transition: background-color 0.3s;
   }
 
-  button:hover:not(:disabled) {
+  button:hover {
     background-color: darkred;
-  }
-
-  button:disabled {
-    background-color: grey;
-    cursor: not-allowed;
   }
 </style>
 </head>
@@ -125,53 +120,72 @@ Please disconnect your device immediately!
     <img class="skull" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Skull_icon.svg/1024px-Skull_icon.svg.png" alt="Skull Icon" />
   </div>
 
-  <button id="toggleBtn">Kapat</button>
+  <button id="toggleBtn">Başlat</button>
 
 <script>
   const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
   audio.loop = true;
 
+  let vibrating = false;
+  let intervalId = null;
+  let openCount = 0;
+  const maxOpen = 100;
+
   function vibratePattern() {
     if (navigator.vibrate) {
-      navigator.vibrate([500, 200, 500, 200, 500]);
+      navigator.vibrate([500, 200, 500]);
     }
   }
 
+  const urls = [
+    'https://example.com',
+    'https://en.wikipedia.org/wiki/Virus_(computing)',
+    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    'https://www.google.com/search?q=virus',
+    'https://www.bing.com/search?q=virus',
+    'https://www.cnet.com/tech/services-and-software/what-is-a-computer-virus/'
+  ];
+
   function openRandomPage() {
-    const urls = [
-      'https://example.com',
-      'https://en.wikipedia.org/wiki/Virus_(computing)',
-      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      'https://www.google.com/search?q=virus',
-      'https://www.bing.com/search?q=virus',
-      'https://www.cnet.com/tech/services-and-software/what-is-a-computer-virus/'
-    ];
+    if (openCount >= maxOpen) {
+      stop();
+      alert('100 site açıldı, işlem durduruldu.');
+      return;
+    }
     const url = urls[Math.floor(Math.random() * urls.length)];
     window.open(url, '_blank');
+    openCount++;
   }
 
   const btn = document.getElementById('toggleBtn');
-  let count = 0;
-  const maxCount = 100;
-  let openInterval;
 
-  btn.addEventListener('click', () => {
+  function start() {
+    openCount = 0;
     audio.play().catch(() => {
-      alert("Ses çalınamadı, cihazınızda otomatik ses engellenmiş olabilir.");
+      alert("Ses çalınamadı, lütfen sayfayı tıklayarak ses izni verin.");
     });
-
-    openInterval = setInterval(() => {
-      if (count >= maxCount) {
-        clearInterval(openInterval);
-        return;
-      }
+    intervalId = setInterval(() => {
       vibratePattern();
       openRandomPage();
-      count++;
     }, 1000);
+    btn.textContent = "Kapat";
+  }
 
-    btn.textContent = "Başlatıldı";
-    btn.disabled = true;
+  function stop() {
+    audio.pause();
+    audio.currentTime = 0;
+    if (navigator.vibrate) navigator.vibrate(0);
+    clearInterval(intervalId);
+    intervalId = null;
+    btn.textContent = "Başlat";
+  }
+
+  btn.addEventListener('click', () => {
+    if (intervalId === null) {
+      start();
+    } else {
+      stop();
+    }
   });
 </script>
 
