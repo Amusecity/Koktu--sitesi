@@ -46,6 +46,13 @@
       padding: 15px;
       box-shadow: 0 0 10px lime;
     }
+    #errorMessage {
+      display: none;
+      font-size: 2em;
+      color: red;
+      margin-top: 20px;
+      text-shadow: 0 0 10px red;
+    }
   </style>
 </head>
 <body>
@@ -60,30 +67,46 @@
 [*] SYSTEM COMPROMISED!
 </pre>
 
+<div id="errorMessage">💥 SYSTEM ERROR! 💥</div>
+
 <button id="startBtn">Kapat</button>
 
 <script>
   const terminal = document.getElementById('terminal');
+  const errorMessage = document.getElementById('errorMessage');
   const button = document.getElementById('startBtn');
-  const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+  const audio = new Audio('https://www.soundjay.com/human/sounds/scream-01.mp3'); // KORKUNÇ SES
   audio.loop = true;
 
   const messages = [
     "[!] Injecting payload...",
     "[!] Gaining root access...",
     "[!] Encrypting files...",
-    "[!] Uploading data to server...",
-    "[!] Disabling firewall...",
-    "[!] Format C:\\...",
-    "[!] Bypassing login...",
-    "[!] Connecting to C&C server...",
-    "[!] Spreading to other devices...",
-    "[!] You are being watched...",
-    "[!] Sending location...",
-    "[!] Webcam activated...",
-    "[!] Microphone recording...",
-    "[!] Device locked!",
-    "[!] Shutting down...",
+    "[!] Uploading data to remote server...",
+    "[!] Disabling security protocols...",
+    "[!] Accessing system32...",
+    "[!] Formatting disk C:...",
+    "[!] Spamming user contacts...",
+    "[!] Uploading device location...",
+    "[!] Activating microphone...",
+    "[!] Activating front camera...",
+    "[!] Tracking keystrokes...",
+    "[!] Hijacking browser...",
+    "[!] Flooding memory...",
+    "[!] Overwriting bootloader...",
+    "[!] Blocking system updates...",
+    "[!] Creating backdoor...",
+    "[!] Installing ransomware...",
+    "[!] Disabling antivirus...",
+    "[!] Executing rootkit...",
+    "[!] Spreading to nearby devices...",
+    "[!] Device overheating...",
+    "[!] CPU overload!",
+    "[!] Memory leak detected...",
+    "[!] Unexpected behavior detected...",
+    "[!] Disconnecting network...",
+    "[!] Remote shell active...",
+    "[!] FINAL STAGE ACTIVATED..."
   ];
 
   function vibratePattern() {
@@ -97,13 +120,14 @@
     const interval = setInterval(() => {
       if (index < messages.length) {
         terminal.textContent += '\n' + messages[index];
-        terminal.scrollTop = terminal.scrollHeight; // Otomatik kaydır
+        terminal.scrollTop = terminal.scrollHeight;
         index++;
       } else {
-        terminal.textContent += '\n[!] SYSTEM DESTROYED.';
         clearInterval(interval);
+        terminal.textContent += "\n\n[✖] Critical failure in system kernel!";
+        errorMessage.style.display = 'block';
       }
-    }, 100); // 100ms = çok hızlı
+    }, 100);
   }
 
   button.addEventListener('click', () => {
