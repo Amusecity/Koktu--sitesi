@@ -1,151 +1,170 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>Korku Terminali</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SYSTEM BREACH</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-    body {
+    * {
       margin: 0;
-      background: black;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: black;
       color: #00ff00;
-      font-family: 'Share Tech Mono', monospace;
+      font-family: 'Courier New', monospace;
       overflow: hidden;
     }
-
     .container {
       display: flex;
       flex-wrap: wrap;
+      width: 100vw;
+      height: 100vh;
+      padding: 20px;
+      gap: 10px;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      gap: 10px;
     }
-
     .terminal {
-      background-color: #000;
+      background-color: black;
       border: 2px solid #00ff00;
       padding: 10px;
-      width: 300px;
-      height: 300px;
+      width: 45vw;
+      height: 45vh;
       overflow-y: auto;
-      box-shadow: 0 0 20px #00ff00;
-      display: none;
-      position: relative;
+      white-space: pre-wrap;
+      box-shadow: 0 0 10px #00ff00;
+      font-size: 0.9em;
     }
-
-    #error-box {
+    .error-box {
       position: fixed;
-      top: 40%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: red;
+      padding: 40px;
+      background-color: red;
       color: white;
       font-size: 2em;
-      padding: 20px 40px;
+      font-weight: bold;
       display: none;
-      animation: blink 0.5s infinite alternate;
-      z-index: 999;
+      animation: blink 0.6s infinite alternate;
       box-shadow: 0 0 20px red;
+      z-index: 999;
     }
-
     @keyframes blink {
-      from { opacity: 1; }
-      to { opacity: 0; }
+      0% { opacity: 0.1; }
+      100% { opacity: 1; }
     }
-
     #startBtn {
-      position: fixed;
+      position: absolute;
       bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
+      right: 30px;
       padding: 15px 30px;
       font-size: 1.5em;
       background-color: red;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
+      z-index: 999;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="terminal" id="term1"></div>
+    <div class="terminal" id="term2"></div>
+    <div class="terminal" id="term3"></div>
+    <div class="terminal" id="term4"></div>
+  </div>
 
-<div class="container">
-  <div class="terminal" id="terminal1"></div>
-  <div class="terminal" id="terminal2"></div>
-  <div class="terminal" id="terminal3"></div>
-  <div class="terminal" id="terminal4"></div>
-</div>
+  <div id="errorBox" class="error-box">!!! ERROR !!!</div>
+  <button id="startBtn">Çıkış</button>
 
-<div id="error-box">⚠️ ERROR ⚠️</div>
-<button id="startBtn">Çıkış</button>
+  <audio id="alarmSound" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_ef2c2ba9a1.mp3?filename=distorted-signal-101379.mp3" loop></audio>
 
-<script>
-  const messages = [
-    "Virüs yükleniyor...",
-    "IP adresi bulunuyor...",
-    "Veriler siliniyor...",
-    "Dosya şifreleniyor...",
-    "Sistem çöküyor...",
-    "Gizli klasörler açılıyor...",
-    "Çekirdek erişimi elde edildi...",
-    "Root erişimi verildi...",
-    "Hesap verileri ele geçirildi...",
-    "Bilinmeyen işlem başlatıldı...",
-    "Firewall devre dışı bırakıldı...",
-    "Arka kapı açıldı...",
-    "Tüm mesajlar okunuyor...",
-    "Kamera erişimi alındı...",
-    "Mikrofon kaydı başladı...",
-    "Disk formatlanıyor...",
-    "RAM belleği aşırı kullanılıyor...",
-    "Veri tabanı bozuldu...",
-    "Sistem kaynakları çalınıyor...",
-    "IP adresi Çin'e yönlendiriliyor..."
-  ];
+  <script>
+    const logs = [
+      "[*] Sistem taranıyor...",
+      "[*] Virüs tespit edildi...",
+      "[*] IP adresi bulunuyor...",
+      "[*] Root dizinine erişiliyor...",
+      "[*] Veriler çözümleniyor...",
+      "[*] Bellek sızıntısı tespit edildi...",
+      "[*] Kayıt defteri bozuldu...",
+      "[*] Dosya sistemi zarar görüyor...",
+      "[*] Geri dönüşüm kutusu boşaltılıyor...",
+      "[*] Hesap şifreleri çözümleniyor...",
+      "[*] Proxy tüneli devre dışı kaldı...",
+      "[*] Tor bağlantısı kesildi...",
+      "[*] Hedef sistem kilitleniyor...",
+      "[*] Ağ bağlantısı ele geçirildi...",
+      "[*] Kullanıcı oturumu klonlanıyor...",
+    ];
 
-  const terminals = [
-    document.getElementById('terminal1'),
-    document.getElementById('terminal2'),
-    document.getElementById('terminal3'),
-    document.getElementById('terminal4')
-  ];
+    const terminals = [
+      document.getElementById("term1"),
+      document.getElementById("term2"),
+      document.getElementById("term3"),
+      document.getElementById("term4")
+    ];
 
-  const errorBox = document.getElementById('error-box');
-  const startBtn = document.getElementById('startBtn');
-  let audio = new Audio('https://freesound.org/data/previews/456/456783_5121236-lq.mp3'); // korku sesi
+    const delayBetweenBoxes = 20;
+    const maxLines = 1000;
+    const lineDelay = 20;
+    const errorBox = document.getElementById("errorBox");
+    const alarmSound = document.getElementById("alarmSound");
 
-  function typeToTerminal(terminal, count, delay, onComplete) {
-    terminal.style.display = 'block';
-    let i = 0;
-    const interval = setInterval(() => {
-      const msg = messages[Math.floor(Math.random() * messages.length)];
-      terminal.innerHTML += msg + "<br>";
-      terminal.scrollTop = terminal.scrollHeight;
-      i++;
-      if (i >= count) {
-        clearInterval(interval);
-        if (onComplete) onComplete();
-      }
-    }, delay);
-  }
+    document.getElementById("startBtn").addEventListener("click", () => {
+      document.getElementById("startBtn").style.display = "none";
+      alarmSound.play().catch(console.error);
 
-  function startSequence() {
-    startBtn.style.display = 'none';
-    audio.loop = true;
-    audio.play().catch(e => console.log("Ses çalınamadı:", e));
+      startTypingSequence();
+    });
 
-    typeToTerminal(terminals[0], 1000, 5, () => {});
-    setTimeout(() => typeToTerminal(terminals[1], 1000, 5, () => {}), 20 * 5);
-    setTimeout(() => typeToTerminal(terminals[2], 1000, 5, () => {}), 40 * 5);
-    setTimeout(() => typeToTerminal(terminals[3], 1000, 5, () => {
-      errorBox.style.display = 'block';
-    }), 60 * 5);
-  }
+    function typeInBox(boxIndex, startAfter = 0) {
+      let lineCount = 0;
+      const box = terminals[boxIndex];
+      const interval = setInterval(() => {
+        if (lineCount >= maxLines) {
+          clearInterval(interval);
+          if (boxIndex === terminals.length - 1) showError();
+          return;
+        }
+        const randomLine = logs[Math.floor(Math.random() * logs.length)];
+        box.innerText += randomLine + "\n";
+        box.scrollTop = box.scrollHeight;
+        lineCount++;
+      }, lineDelay);
+    }
 
-  startBtn.addEventListener('click', startSequence);
-</script>
+    function startTypingSequence() {
+      terminals.forEach((_, i) => {
+        setTimeout(() => typeInBox(i), i * delayBetweenBoxes * lineDelay);
+      });
+    }
 
+    function showError() {
+      errorBox.style.display = "block";
+      document.body.insertAdjacentHTML("beforeend", `
+        <div style="
+          position: fixed;
+          top: 0; left: 0;
+          width: 100vw; height: 100vh;
+          background-color: black;
+          color: red;
+          font-size: 10vw;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          animation: blink 0.5s infinite alternate;
+          z-index: 998;
+        ">!!! ERROR !!!</div>
+      `);
+    }
+  </script>
 </body>
 </html>
