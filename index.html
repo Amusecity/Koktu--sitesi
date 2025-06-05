@@ -5,70 +5,92 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Telefon Korkutma</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
   body {
     margin: 0;
     height: 100vh;
     background-color: black;
-    color: white;
-    font-family: 'Courier New', monospace;
+    color: #00FF00;
+    font-family: 'Share Tech Mono', monospace;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
-    animation: blinkRed 0.5s infinite alternate;
-    text-align: center;
+    animation: blinkRed 1s infinite alternate;
   }
   @keyframes blinkRed {
-    0% {
-      background-color: black;
-      color: white;
-      transform: translate(0, 0);
-    }
-    50% {
-      background-color: red;
-      color: yellow;
-      transform: translate(5px, -5px);
-    }
-    100% {
-      background-color: black;
-      color: white;
-      transform: translate(0, 0);
-    }
+    0% { background-color: black; }
+    50% { background-color: #220000; }
+    100% { background-color: black; }
   }
-  h1 {
-    font-size: 2.5em;
+  .terminal {
+    background: black;
+    border: 2px solid #00FF00;
+    padding: 20px;
+    width: 90vw;
+    max-width: 600px;
+    box-sizing: border-box;
+    box-shadow: 0 0 20px #00FF00;
+    position: relative;
   }
-  p {
-    font-size: 1.2em;
+  .terminal h1 {
+    margin: 0 0 10px 0;
+    font-size: 1.8em;
+    color: red;
+    text-align: center;
   }
-  button {
-    margin-top: 30px;
-    font-size: 1.2em;
-    padding: 10px 20px;
+  .terminal pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 1.1em;
+    line-height: 1.3em;
+  }
+  .skull {
+    position: absolute;
+    top: -40px;
+    right: 20px;
+    width: 50px;
+    filter: drop-shadow(0 0 5px red);
   }
 </style>
 </head>
 <body>
-  <h1>⚠️ Telefonunuz Tehlikede! ⚠️</h1>
-  <p>Virüs tespit edildi! Lütfen dikkatli olun!</p>
+  <div class="terminal">
+    <h1>⚠️ SYSTEM BREACH DETECTED ⚠️</h1>
+    <pre>
+>>> WARNING! VIRUS DETECTED IN SYSTEM <<<
 
-  <button id="startBtn">Uyarı Sesini Başlat</button>
+[*] Attempting to contain threat...
+[*] Virus spreading rapidly...
+[*] SYSTEM COMPROMISED!
 
-  <script>
-    function vibratePattern() {
-      if (navigator.vibrate) {
-        navigator.vibrate([500, 200, 500, 200, 500]);
-      }
+Please disconnect your device immediately!
+    </pre>
+    <img class="skull" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Skull_icon.svg/1024px-Skull_icon.svg.png" alt="Skull Icon" />
+  </div>
+
+<script>
+  // Titreşim başlat
+  function vibratePattern() {
+    if (navigator.vibrate) {
+      navigator.vibrate([500, 200, 500, 200, 500]);
     }
+  }
 
-    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+  // Ses dosyası (alarm)
+  const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+  audio.loop = true;
 
-    document.getElementById('startBtn').addEventListener('click', () => {
-      audio.loop = true;
-      audio.play();
-      setInterval(vibratePattern, 1000);
-      document.getElementById('startBtn').style.display = 'none';
+  // Sayfa yüklendiğinde titreşim ve sesi başlat
+  window.onload = () => {
+    audio.play().catch(() => {
+      // Oynatma engellenirse, kullanıcı etkileşimi bekleyebiliriz
+      console.log('Ses oynatma için kullanıcı etkileşimi gerekli.');
     });
-  </script>
+    setInterval(vibratePattern, 1000);
+  };
+</script>
 </body>
 </html>
