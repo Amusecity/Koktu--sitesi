@@ -17,7 +17,16 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #0f0;
+    position: relative;
+  }
+
+  /* Arka plan kırmızı yanıp sönme animasyonu */
+  @keyframes bgBlink {
+    0%, 100% { background-color: black; }
+    50% { background-color: #8B0000; }
+  }
+  body {
+    animation: bgBlink 1.5s infinite;
   }
 
   #container {
@@ -32,39 +41,74 @@
   }
 
   .terminal-box {
-    background: black;
-    border: 3px solid #0f0;
-    box-shadow: 0 0 20px #0f0;
+    box-sizing: border-box;
     padding: 20px;
-    position: relative;
     overflow-y: auto;
-    color: #0f0;
-    font-size: 1.2em;
+    font-size: 1.3em;
     line-height: 1.4em;
     white-space: pre-wrap;
     word-break: break-word;
+    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: black;
+    border: 3px solid;
+    box-shadow: 0 0 10px;
   }
 
-  .terminal-box.red {
+  /* 1. kutu: yeşil yazı, siyah arka plan, yeşil border */
+  #box1 {
+    color: #0f0;
+    background: black;
+    border-color: #0f0;
+    box-shadow: 0 0 20px #0f0;
+  }
+
+  /* 2. kutu: kırmızı yazı, siyah arka plan, kırmızı border */
+  #box2 {
     color: #f00;
+    background: black;
     border-color: #f00;
-    box-shadow: 0 0 30px #f00;
+    box-shadow: 0 0 20px #f00;
+  }
+
+  /* 3. kutu: beyaz yazı, siyah arka plan, gri border */
+  #box3 {
+    color: #fff;
+    background: black;
+    border-color: #888;
+    box-shadow: 0 0 15px #888;
+  }
+
+  /* 4. kutu: siyah yazı, beyaz arka plan, siyah border */
+  #box4 {
+    color: black;
+    background: white;
+    border-color: black;
+    box-shadow: 0 0 15px black;
+  }
+
+  /* Kare şekil için */
+  #container > div {
+    aspect-ratio: 1 / 1;
   }
 
   #error-overlay {
     position: fixed;
     top:0; left:0; right:0; bottom:0;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.95);
     color: #f00;
-    font-size: 6em;
+    font-size: 10em;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-shadow: 0 0 20px #f00;
+    text-shadow: 0 0 40px #f00;
     visibility: hidden;
     animation: blink 1s infinite;
-    z-index: 1000;
+    z-index: 10000;
   }
 
   @keyframes blink {
@@ -89,6 +133,31 @@
   #startBtn:hover {
     background: #0a0;
   }
+
+  /* Etrafında yanıp sönen ünlem işaretleri için container */
+  #exclamations {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 9999;
+  }
+
+  .exclamation {
+    position: absolute;
+    color: #f00;
+    font-size: 3em;
+    font-weight: bold;
+    text-shadow: 0 0 10px #f00;
+    animation: blinkExclamation 1.2s infinite;
+    user-select: none;
+  }
+
+  @keyframes blinkExclamation {
+    0%, 100% {opacity: 1;}
+    50% {opacity: 0;}
+  }
+
 </style>
 </head>
 <body>
@@ -97,17 +166,19 @@
 
 <div id="container" style="display:none;">
   <div id="box1" class="terminal-box"></div>
-  <div id="box2" class="terminal-box red"></div>
+  <div id="box2" class="terminal-box"></div>
   <div id="box3" class="terminal-box"></div>
-  <div id="box4" class="terminal-box red"></div>
+  <div id="box4" class="terminal-box"></div>
 </div>
 
 <div id="error-overlay">ERROR</div>
+<div id="exclamations"></div>
 
 <script>
   const startBtn = document.getElementById('startBtn');
   const container = document.getElementById('container');
   const errorOverlay = document.getElementById('error-overlay');
+  const exclamationsContainer = document.getElementById('exclamations');
 
   // 2000 satırlık virüs temalı yazılar
   const messages = [];
@@ -117,7 +188,7 @@
       `IP adresi tespit edildi: 192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}\n` +
       `Kişisel veriler siliniyor...\n` +
       `Hesap içi veriler ele geçirildi.\n` +
-      `Sistem güvenliği yok!\n`
+      `Sistem güvenliği yok!\n\n`
     );
   }
 
@@ -128,10 +199,10 @@
     document.getElementById('box4')
   ];
 
-  let currentMsgIndex = [0,0,0,0]; // Her kutunun ayrı mesaj indeksi
-  let writtenCount = [0,0,0,0];    // Her kutunun kaç yazı yazdığı
-  const maxLines = 1000;           // Her kutu 1000 yazı yazacak
-  const startNextAt = 50;          // Her kutu 50 yazıdan sonra diğer kutu başlasın
+  let currentMsgIndex = [0,0,0,0];
+  let writtenCount = [0,0,0,0];
+  const maxLines = 1000;
+  const startNextAt = 5; // kutular arası geçiş için
 
   let startedBoxes = [false,false,false,false];
 
@@ -142,7 +213,7 @@
       if(i < message.length) {
         box.textContent += message.charAt(i);
         i++;
-        setTimeout(typeChar, 8);  // Hız artırıldı: 8 ms / karakter
+        setTimeout(typeChar, 25); // biraz yavaş yazı hızı
       } else {
         callback();
       }
@@ -152,50 +223,86 @@
 
   function startBox(boxIndex) {
     if(boxIndex > 3) return;
-    if(startedBoxes[boxIndex]) return; // zaten başlamış
+    if(startedBoxes[boxIndex]) return;
     startedBoxes[boxIndex] = true;
     writeNextLine(boxIndex);
   }
 
   function writeNextLine(boxIndex) {
-    if(currentMsgIndex[boxIndex] >= maxLines) {
-      // Bu kutu tamamlandı, kontrol hata gösterimi
-      if(boxIndex === 3) {
-        showError();
-      }
-      return;
-    }
+    if(currentMsgIndex[boxIndex] >= maxLines) return;
 
     const message = messages[currentMsgIndex[boxIndex]];
     typeMessage(boxIndex, message, () => {
       currentMsgIndex[boxIndex]++;
       writtenCount[boxIndex]++;
 
-      // 50 yazı sonrası diğer kutu başlat
       if(writtenCount[boxIndex] === startNextAt && boxIndex < 3) {
         startBox(boxIndex + 1);
-      }
-
-      // Son kutu 1000 satır yazınca hata göster
-      if(boxIndex === 3 && writtenCount[boxIndex] >= maxLines) {
-        showError();
-        return;
       }
 
       writeNextLine(boxIndex);
     });
   }
 
+  // Ekranın dört bir yanına ünlem işaretleri yerleştir
+  function createExclamations() {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const count = 30; // kaç tane ünlem işareti olacak
+
+    for(let i=0; i<count; i++) {
+      const exclamation = document.createElement('div');
+      exclamation.classList.add('exclamation');
+      exclamation.textContent = '!';
+      // Random pozisyonlar ekran etrafına
+      // Üst, alt, sol, sağ kenarlara rastgele dağıtalım:
+      let posX, posY;
+      const side = Math.floor(Math.random() * 4);
+      switch(side){
+        case 0: // üst
+          posX = Math.random() * vw;
+          posY = Math.random() * 50;
+          break;
+        case 1: // alt
+          posX = Math.random() * vw;
+          posY = vh - (Math.random() * 50);
+          break;
+        case 2: // sol
+          posX = Math.random() * 50;
+          posY = Math.random() * vh;
+          break;
+        case 3: // sağ
+          posX = vw - (Math.random() * 50);
+          posY = Math.random() * vh;
+          break;
+      }
+      exclamation.style.left = posX + 'px';
+      exclamation.style.top = posY + 'px';
+
+      // Her ünlem için biraz farklı animasyon gecikmesi
+      exclamation.style.animationDelay = (Math.random()*1.5) + 's';
+
+      exclamationsContainer.appendChild(exclamation);
+    }
+  }
+
   function showError() {
     errorOverlay.style.visibility = 'visible';
+    createExclamations();
   }
 
   startBtn.addEventListener('click', () => {
     startBtn.style.display = 'none';
     container.style.display = 'grid';
-    startBox(0); // İlk kutu başlasın
+    startBox(0);
+
+    // 10 saniye sonra hata ekranı göster
+    setTimeout(() => {
+      showError();
+    }, 10000);
   });
 
 </script>
+
 </body>
 </html>
