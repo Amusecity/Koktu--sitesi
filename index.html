@@ -3,125 +3,170 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hacked Terminal</title>
+<title>Korkunç Hacklenmiş Terminal</title>
 <style>
-  body, html {
-    margin: 0; padding: 0; height: 100%;
-    background: black;
-    color: #00FF00;
-    font-family: 'Courier New', Courier, monospace;
-    overflow: hidden;
-  }
-  #terminal {
-    padding: 20px;
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  body {
+    margin: 0;
     height: 100vh;
+    background-color: black;
+    color: red;
+    font-family: 'Share Tech Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    animation: blinkBackground 0.3s infinite alternate;
+  }
+
+  @keyframes blinkBackground {
+    0% { background-color: black; }
+    50% { background-color: darkred; }
+    100% { background-color: black; }
+  }
+
+  .terminal {
+    background: black;
+    border: 3px solid red;
+    padding: 20px;
+    width: 90vw;
+    max-width: 700px;
     box-sizing: border-box;
-    white-space: pre-wrap;
+    box-shadow: 0 0 30px red;
+    color: lime;
+    height: 400px;
     overflow-y: auto;
+    user-select: none;
+    position: relative;
   }
-  .cursor {
-    display: inline-block;
-    width: 10px;
-    background: #00FF00;
-    margin-left: 2px;
-    animation: blink 1s infinite;
+
+  .terminal h2 {
+    color: crimson;
+    margin: 0 0 15px 0;
+    text-shadow: 0 0 10px red;
   }
-  @keyframes blink {
-    0%, 50% {opacity: 1;}
-    51%, 100% {opacity: 0;}
+
+  .skull {
+    position: absolute;
+    top: -40px;
+    right: 10px;
+    width: 70px;
+    filter: drop-shadow(0 0 8px crimson);
+    animation: flickerSkull 0.2s infinite alternate;
   }
-  .shake {
-    animation: shake 0.2s infinite;
+
+  @keyframes flickerSkull {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
   }
-  @keyframes shake {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    10% { transform: translate(-1px, -2px) rotate(-1deg); }
-    20% { transform: translate(-3px, 0px) rotate(1deg); }
-    30% { transform: translate(3px, 2px) rotate(0deg); }
-    40% { transform: translate(1px, -1px) rotate(1deg); }
-    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-    60% { transform: translate(-3px, 1px) rotate(0deg); }
-    70% { transform: translate(3px, 1px) rotate(-1deg); }
-    80% { transform: translate(-1px, -1px) rotate(1deg); }
-    90% { transform: translate(1px, 2px) rotate(0deg); }
-    100% { transform: translate(1px, -2px) rotate(-1deg); }
+
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 1.1em;
+    line-height: 1.2em;
+  }
+
+  .warning {
+    color: red;
+    font-weight: bold;
+    text-shadow: 0 0 7px red;
   }
 </style>
 </head>
 <body>
-  <div id="terminal"></div>
+  <div class="terminal" aria-live="polite" aria-atomic="false" aria-relevant="additions">
+    <h2>⚠️ SYSTEM BREACH DETECTED ⚠️</h2>
+    <img class="skull" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Skull_icon.svg/1024px-Skull_icon.svg.png" alt="Skull Icon" />
+    <pre id="terminalText"></pre>
+  </div>
 
 <script>
-  const terminal = document.getElementById('terminal');
+  const terminal = document.getElementById('terminalText');
+  const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+  audio.loop = true;
 
-  // Yazılacak metin satır satır
-  const lines = [
-    "C:\\Users\\admin> booting system...",
-    "Initializing hardware...",
-    "Loading kernel modules...",
-    "Warning: Unauthorized access detected!",
-    "Virus signature found in memory!",
-    "Attempting to isolate threat...",
-    "!!! SYSTEM COMPROMISED !!!",
-    "Launching countermeasures...",
-    "Warning: System integrity at 10%",
-    "!!! ROOT ACCESS GRANTED TO INTRUDER !!!",
-    "Dumping confidential files...",
-    "Uploading data to remote server...",
-    "Deleting system logs...",
-    "!! ALERT: Firewall disabled !!",
-    "User accounts compromised:",
-    " - admin",
-    " - guest",
-    " - root",
-    "System shutdown imminent in 10 seconds...",
-    "C:\\Users\\admin>"
+  // Mesajlar dizisi, hızlı ve korkutucu
+  const messages = [
+    ">>> WARNING: SYSTEM INTRUSION DETECTED <<<",
+    "[*] Virus spreading through network...",
+    "[*] Ransomware encrypting files...",
+    "[*] Firewall breached...",
+    "[*] Accessing root privileges...",
+    "[*] Erasing backups...",
+    "!!! DATA CORRUPTION IMMINENT !!!",
+    "!!! SYSTEM OVERLOAD IMMINENT !!!",
+    ">>> INITIATING SELF DESTRUCTION SEQUENCE <<<",
+    "!!! DO NOT TURN OFF YOUR DEVICE !!!",
+    "!!! SYSTEM FAILURE IN 10 SECONDS !!!",
+    ">>> Disconnect device immediately! <<<",
+    "[ERROR] MALWARE INJECTION SUCCESSFUL!",
+    ">>> SYSTEM BREACH COMPLETE <<<",
+    "[*] Tracing your location...",
+    "[*] Locking device...",
+    ">>> ALERT: ALL SYSTEMS COMPROMISED <<<"
   ];
 
-  let lineIndex = 0;
-  let charIndex = 0;
+  let index = 0;
 
-  // Cursor oluştur
-  const cursor = document.createElement('span');
-  cursor.className = 'cursor';
-  cursor.textContent = ' ';
-
-  // Vibrate on mobile
-  function vibrate() {
-    if(navigator.vibrate) {
-      navigator.vibrate([200, 100, 200]);
+  function appendMessage() {
+    if (index < messages.length) {
+      terminal.textContent += messages[index] + "\n";
+      terminal.scrollTop = terminal.scrollHeight;
+      index++;
+    } else {
+      // Mesajlar bitti, tekrar başa sarabilir veya hızlı kaos devam edebilir
+      terminal.textContent += ">>> SYSTEM ERROR: UNKNOWN FAULT <<<\n";
+      terminal.scrollTop = terminal.scrollHeight;
     }
   }
 
-  // Ses efekti
-  const beep = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+  // Otomatik hızla mesajları yazdır
+  const msgInterval = setInterval(() => {
+    appendMessage();
+  }, 300);
 
-  // Terminale yazdıran fonksiyon
-  function typeLine() {
-    if(lineIndex >= lines.length) {
-      cursor.remove();
-      // Titreşim başlat (kafayı yedirmiş gibi)
-      terminal.classList.add('shake');
-      vibrate();
-      beep.loop = true;
-      beep.play();
+  // Titreşim fonksiyonu (mobilde destek varsa)
+  function vibratePattern() {
+    if (navigator.vibrate) {
+      navigator.vibrate([400, 200, 400, 200, 400]);
+    }
+  }
+
+  // Hemen titreştir, sonra her 1 saniyede titreştir
+  vibratePattern();
+  setInterval(vibratePattern, 1000);
+
+  // Alarm sesini başlat (mobilde otomatik olmayabilir, izin isteyebilir)
+  audio.play().catch(() => {
+    // İzin reddedilirse sessiz kalır
+  });
+
+  // 1 saniyede 1 yeni sekme aç (korkutucu spam)
+  let spamCount = 0;
+  const spamLimit = 100;
+
+  const urls = [
+    'https://example.com',
+    'https://en.wikipedia.org/wiki/Virus_(computing)',
+    'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Rickroll :)
+    'https://www.google.com/search?q=virus',
+    'https://www.bing.com/search?q=virus'
+  ];
+
+  const spamInterval = setInterval(() => {
+    if (spamCount >= spamLimit) {
+      clearInterval(spamInterval);
       return;
     }
-
-    if(charIndex < lines[lineIndex].length) {
-      terminal.textContent += lines[lineIndex][charIndex];
-      charIndex++;
-      setTimeout(typeLine, 50 + Math.random() * 100); // Rastgele hız
-    } else {
-      terminal.textContent += '\n';
-      lineIndex++;
-      charIndex = 0;
-      setTimeout(typeLine, 500);
-    }
-  }
-
-  terminal.appendChild(cursor);
-  typeLine();
+    const url = urls[Math.floor(Math.random() * urls.length)];
+    window.open(url, '_blank');
+    spamCount++;
+  }, 1000);
 </script>
 </body>
 </html>
