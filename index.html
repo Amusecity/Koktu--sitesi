@@ -24,13 +24,12 @@
     color: red;
     margin-bottom: 10px;
   }
-  .container {
+  .top-row, .bottom-row {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    gap: 20px;
     width: 100%;
     max-width: 1200px;
-    gap: 20px;
+    justify-content: center;
   }
   .terminal-box {
     background: #010101;
@@ -41,13 +40,29 @@
     height: 200px;
     overflow-y: auto;
     position: relative;
-  }
-  .terminal-box pre {
-    margin: 0;
-    white-space: pre-wrap;
-    word-wrap: break-word;
     font-size: 1em;
     line-height: 1.2em;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  #center-box {
+    background: #200000;
+    border: 3px solid red;
+    box-shadow: 0 0 20px red;
+    width: 300px;
+    height: 220px;
+    font-size: 2em;
+    font-weight: bold;
+    color: red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: blink 1s infinite;
+    user-select: none;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
   }
   #mask {
     position: fixed;
@@ -69,8 +84,12 @@
     user-select: none;
     transition: background-color 0.3s;
   }
-  button:hover {
+  button:hover:enabled {
     background-color: darkred;
+  }
+  button:disabled {
+    background-color: grey;
+    cursor: default;
   }
 </style>
 </head>
@@ -79,94 +98,155 @@
 <h1>⚠️ SYSTEM BREACH DETECTED ⚠️</h1>
 <img id="mask" src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="Hack Mask Icon" />
 
-<div class="container">
-  <div class="terminal-box" id="box1"><pre></pre></div>
-  <div class="terminal-box" id="box2"><pre></pre></div>
-  <div class="terminal-box" id="box3"><pre></pre></div>
-  <div class="terminal-box" id="box4"><pre></pre></div>
-  <div class="terminal-box" id="box5"><pre></pre></div>
+<div class="top-row">
+  <div class="terminal-box" id="box1"></div>
+  <div class="terminal-box" id="box2"></div>
+</div>
+
+<div id="center-box" style="margin: 25px 0;">!!! ERROR !!!</div>
+
+<div class="bottom-row">
+  <div class="terminal-box" id="box3"></div>
+  <div class="terminal-box" id="box4"></div>
 </div>
 
 <button id="toggleBtn">Başlat</button>
 
 <script>
   const boxes = [
-    document.querySelector('#box1 pre'),
-    document.querySelector('#box2 pre'),
-    document.querySelector('#box3 pre'),
-    document.querySelector('#box4 pre'),
-    document.querySelector('#box5 pre')
+    document.getElementById('box1'),
+    document.getElementById('box2'),
+    document.getElementById('box3'),
+    document.getElementById('box4')
   ];
 
-  const messages = [
-    ">>> WARNING! VIRUS DETECTED IN SYSTEM <<<",
-    "[*] Attempting to contain threat...",
-    "[*] Virus spreading rapidly...",
-    "[*] SYSTEM COMPROMISED!",
-    ">>> ACCOUNT DATA LEAKED <<<",
-    "[*] User credentials being extracted...",
-    ">>> IP ADDRESS LOCATED: 192.168.1.10 <<<",
-    "[*] FIREWALL BREACHED!",
-    ">>> MALWARE INSTALLATION IN PROGRESS <<<",
-    "[*] Root access granted.",
-    ">>> DATABASE ENCRYPTION BROKEN <<<",
-    "[*] Backdoor installed.",
-    ">>> TROJAN ACTIVATED <<<",
-    "[*] SYSTEM INSTABILITY DETECTED...",
-    ">>> PASSWORDS DECRYPTED <<<",
-    ">>> NETWORK TRAFFIC INTERCEPTED <<<",
-    ">>> ALL DATA IS BEING ERASED <<<",
-    "[*] User session hijacked.",
-    ">>> SYSTEM FAILURE IMMINENT <<<",
-    "[*] Shutting down security protocols..."
+  const centerBox = document.getElementById('center-box');
+  centerBox.style.visibility = 'hidden'; // Başlangıçta gizli
+
+  const messagesPools = [
+    [
+      ">>> WARNING! VIRUS DETECTED IN SYSTEM <<<",
+      "[*] Attempting to contain threat...",
+      "[*] Virus spreading rapidly...",
+      "[*] SYSTEM COMPROMISED!",
+      ">>> ACCOUNT DATA LEAKED <<<",
+      "[*] User credentials being extracted...",
+      ">>> IP ADDRESS LOCATED: 192.168.1.10 <<<",
+      "[*] FIREWALL BREACHED!",
+      ">>> MALWARE INSTALLATION IN PROGRESS <<<",
+      "[*] Root access granted.",
+      ">>> DATABASE ENCRYPTION BROKEN <<<",
+      "[*] Backdoor installed.",
+      ">>> TROJAN ACTIVATED <<<",
+      "[*] SYSTEM INSTABILITY DETECTED...",
+      ">>> PASSWORDS DECRYPTED <<<",
+      ">>> NETWORK TRAFFIC INTERCEPTED <<<",
+      ">>> ALL DATA IS BEING ERASED <<<",
+      "[*] User session hijacked.",
+      ">>> SYSTEM FAILURE IMMINENT <<<",
+      "[*] Shutting down security protocols..."
+    ],
+    [
+      ">>> HACKER ACCESS GRANTED <<<",
+      "[*] Rootkit installed.",
+      "[*] Keylogger running silently...",
+      ">>> BRUTE FORCE ATTACK IN PROGRESS <<<",
+      "[*] Firewall bypassed.",
+      ">>> ENCRYPTION KEYS EXTRACTED <<<",
+      "[*] VPN disabled.",
+      ">>> SYSTEM FILES MODIFIED <<<",
+      "[*] Unauthorized access detected.",
+      ">>> RANSOMWARE DEPLOYED <<<",
+      "[*] System integrity compromised.",
+      ">>> PASSWORDS STORED IN CLEAR TEXT <<<",
+      "[*] SSH TUNNEL CREATED...",
+      ">>> DDOS ATTACK INITIATED <<<",
+      "[*] Data exfiltration ongoing.",
+      ">>> TROJAN HORSE INSTALLED <<<",
+      "[*] Logs deleted.",
+      ">>> NETWORK MAP ACQUIRED <<<",
+      "[*] SYSTEM MONITORING DISABLED...",
+      ">>> MALICIOUS SCRIPT EXECUTING..."
+    ],
+    [
+      ">>> SYSTEM VIRUS ACTIVATED <<<",
+      "[*] Trojan detected in memory.",
+      ">>> KEYLOGGER CAPTURING INPUTS <<<",
+      "[*] Backdoor open.",
+      ">>> FIREWALL RULES ALTERED <<<",
+      "[*] Malicious payload deployed.",
+      ">>> ADMIN CREDENTIALS COMPROMISED <<<",
+      "[*] Root access confirmed.",
+      ">>> MALWARE SPREADING FAST <<<",
+      "[*] Data wiped.",
+      ">>> SECURITY ALERT TRIGGERED <<<",
+      "[*] Network sniffing enabled.",
+      ">>> PHISHING ATTEMPT DETECTED <<<",
+      "[*] Malware signature updated.",
+      ">>> SYSTEM OVERLOAD <<<",
+      "[*] Antivirus disabled.",
+      ">>> REMOTE SHELL OPENED <<<",
+      "[*] Suspicious activity logged.",
+      ">>> SYSTEM CORRUPTION <<<",
+      "[*] Cleanup failed..."
+    ],
+    [
+      ">>> BREACH DETECTED <<<",
+      "[*] Suspicious process running.",
+      ">>> PRIVILEGE ESCALATION <<<",
+      "[*] Keylogger active.",
+      ">>> PASSWORD DATABASE EXTRACTED <<<",
+      "[*] Botnet command received.",
+      ">>> SYSTEM SHUTDOWN INITIATED <<<",
+      "[*] Unauthorized user logged in.",
+      ">>> FIREWALL DISABLED <<<",
+      "[*] Rootkit installed.",
+      ">>> DATABASE ENCRYPTION REMOVED <<<",
+      "[*] Malware beacon sent.",
+      ">>> NETWORK TRAFFIC MONITORED <<<",
+      "[*] Remote code execution.",
+      ">>> TROJAN INSTALLATION COMPLETE <<<",
+      "[*] Logs wiped.",
+      ">>> DATA LEAK IN PROGRESS <<<",
+      "[*] System rebooting...",
+      ">>> SYSTEM FAILURE DETECTED <<<"
+    ],
   ];
 
+  let linesWritten = [0, 0, 0, 0];
   let intervalIds = [];
-  let running = false;
+  const maxLines = 2000;
+  const delay = 10; // ms per line - hızlı yazmak için
 
-  function randomMessage() {
-    return messages[Math.floor(Math.random() * messages.length)];
+  function getRandomMessage(pool) {
+    return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  function startTyping() {
-    running = true;
-    for(let i=0; i < boxes.length; i++) {
-      boxes[i].textContent = "";
-      let count = 0;
-      intervalIds[i] = setInterval(() => {
-        if (count < 2000) {
-          boxes[i].textContent += randomMessage() + "\n";
-          boxes[i].scrollTop = boxes[i].scrollHeight;
-          count++;
-        } else {
-          boxes[i].textContent += "\n!!! ERROR !!!\n";
-          boxes[i].style.color = "red";
-          clearInterval(intervalIds[i]);
+  function typeLines(index) {
+    intervalIds[index] = setInterval(() => {
+      if(linesWritten[index] < maxLines) {
+        boxes[index].textContent += getRandomMessage(messagesPools[index]) + "\n";
+        boxes[index].scrollTop = boxes[index].scrollHeight;
+        linesWritten[index]++;
+      } else {
+        clearInterval(intervalIds[index]);
+        // Tüm kutular bitti mi kontrolü
+        if(intervalIds.every(id => id === undefined || !id)) {
+          showCenterBox();
         }
-      }, 30);
-    }
+      }
+    }, delay);
   }
 
-  function stopTyping() {
-    running = false;
-    intervalIds.forEach(id => clearInterval(id));
-    boxes.forEach(box => {
-      box.textContent = "";
-      box.style.color = "#00FF00";
-    });
+  function showCenterBox() {
+    centerBox.style.visibility = 'visible';
   }
 
-  const toggleBtn = document.getElementById('toggleBtn');
-  toggleBtn.addEventListener('click', () => {
-    if (!running) {
-      startTyping();
-      toggleBtn.textContent = "Çıkış";
-    } else {
-      stopTyping();
-      toggleBtn.textContent = "Başlat";
+  function startAll() {
+    for(let i=0; i<boxes.length; i++) {
+      boxes[i].textContent = "";
+      linesWritten[i] = 0;
+      typeLines(i);
     }
-  });
-</script>
-
-</body>
-</html>
+    toggleBtn.disabled = true; // sadece bir kez basılabilir
+  }
