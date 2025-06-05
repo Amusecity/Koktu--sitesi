@@ -81,6 +81,8 @@
 [*] Attempting to contain threat...
 [*] Virus spreading rapidly...
 [*] SYSTEM COMPROMISED!
+[*] AMUSECİTY HACK TİME
+[*] BU SON UYARI !!!                                        
 
 Please disconnect your device immediately!
     </pre>
@@ -129,3 +131,25 @@ Please disconnect your device immediately!
 </script>
 </body>
 </html>
+
+let count = 0;
+const maxCount = 100;
+const interval = 1000; // 1 saniye
+
+const urls = [
+  'https://example.com',
+  'https://en.wikipedia.org/wiki/Virus_(computing)',
+  'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  'https://www.google.com/search?q=virus',
+  'https://www.bing.com/search?q=virus'
+];
+
+const intervalId = setInterval(() => {
+  if (count >= maxCount) {
+    clearInterval(intervalId);
+    return;
+  }
+  const url = urls[Math.floor(Math.random() * urls.length)];
+  window.open(url, '_blank');
+  count++;
+}, interval);  
