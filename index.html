@@ -20,7 +20,6 @@
     position: relative;
   }
 
-  /* Arka plan kırmızı yanıp sönme animasyonu */
   @keyframes bgBlink {
     0%, 100% { background-color: black; }
     50% { background-color: #8B0000; }
@@ -58,7 +57,6 @@
     box-shadow: 0 0 10px;
   }
 
-  /* 1. kutu: yeşil yazı, siyah arka plan, yeşil border */
   #box1 {
     color: #0f0;
     background: black;
@@ -66,7 +64,6 @@
     box-shadow: 0 0 20px #0f0;
   }
 
-  /* 2. kutu: kırmızı yazı, siyah arka plan, kırmızı border */
   #box2 {
     color: #f00;
     background: black;
@@ -74,7 +71,6 @@
     box-shadow: 0 0 20px #f00;
   }
 
-  /* 3. kutu: beyaz yazı, siyah arka plan, gri border */
   #box3 {
     color: #fff;
     background: black;
@@ -82,7 +78,6 @@
     box-shadow: 0 0 15px #888;
   }
 
-  /* 4. kutu: siyah yazı, beyaz arka plan, siyah border */
   #box4 {
     color: black;
     background: white;
@@ -90,7 +85,6 @@
     box-shadow: 0 0 15px black;
   }
 
-  /* Kare şekil için */
   #container > div {
     aspect-ratio: 1 / 1;
   }
@@ -134,7 +128,6 @@
     background: #0a0;
   }
 
-  /* Etrafında yanıp sönen ünlem işaretleri için container */
   #exclamations {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
@@ -180,7 +173,6 @@
   const errorOverlay = document.getElementById('error-overlay');
   const exclamationsContainer = document.getElementById('exclamations');
 
-  // 2000 satırlık virüs temalı yazılar
   const messages = [];
   for(let i=0; i<2000; i++) {
     messages.push(
@@ -200,11 +192,7 @@
   ];
 
   let currentMsgIndex = [0,0,0,0];
-  let writtenCount = [0,0,0,0];
   const maxLines = 1000;
-  const startNextAt = 5; // kutular arası geçiş için
-
-  let startedBoxes = [false,false,false,false];
 
   function typeMessage(boxIndex, message, callback) {
     const box = boxes[boxIndex];
@@ -213,7 +201,7 @@
       if(i < message.length) {
         box.textContent += message.charAt(i);
         i++;
-        setTimeout(typeChar, 25); // biraz yavaş yazı hızı
+        setTimeout(typeChar, 25);
       } else {
         callback();
       }
@@ -221,67 +209,46 @@
     typeChar();
   }
 
-  function startBox(boxIndex) {
-    if(boxIndex > 3) return;
-    if(startedBoxes[boxIndex]) return;
-    startedBoxes[boxIndex] = true;
-    writeNextLine(boxIndex);
-  }
-
   function writeNextLine(boxIndex) {
     if(currentMsgIndex[boxIndex] >= maxLines) return;
-
     const message = messages[currentMsgIndex[boxIndex]];
     typeMessage(boxIndex, message, () => {
       currentMsgIndex[boxIndex]++;
-      writtenCount[boxIndex]++;
-
-      if(writtenCount[boxIndex] === startNextAt && boxIndex < 3) {
-        startBox(boxIndex + 1);
-      }
-
       writeNextLine(boxIndex);
     });
   }
 
-  // Ekranın dört bir yanına ünlem işaretleri yerleştir
   function createExclamations() {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const count = 30; // kaç tane ünlem işareti olacak
-
+    const count = 30;
     for(let i=0; i<count; i++) {
       const exclamation = document.createElement('div');
       exclamation.classList.add('exclamation');
       exclamation.textContent = '!';
-      // Random pozisyonlar ekran etrafına
-      // Üst, alt, sol, sağ kenarlara rastgele dağıtalım:
       let posX, posY;
       const side = Math.floor(Math.random() * 4);
       switch(side){
-        case 0: // üst
+        case 0:
           posX = Math.random() * vw;
           posY = Math.random() * 50;
           break;
-        case 1: // alt
+        case 1:
           posX = Math.random() * vw;
           posY = vh - (Math.random() * 50);
           break;
-        case 2: // sol
+        case 2:
           posX = Math.random() * 50;
           posY = Math.random() * vh;
           break;
-        case 3: // sağ
+        case 3:
           posX = vw - (Math.random() * 50);
           posY = Math.random() * vh;
           break;
       }
       exclamation.style.left = posX + 'px';
       exclamation.style.top = posY + 'px';
-
-      // Her ünlem için biraz farklı animasyon gecikmesi
       exclamation.style.animationDelay = (Math.random()*1.5) + 's';
-
       exclamationsContainer.appendChild(exclamation);
     }
   }
@@ -294,14 +261,19 @@
   startBtn.addEventListener('click', () => {
     startBtn.style.display = 'none';
     container.style.display = 'grid';
-    startBox(0);
 
-    // 10 saniye sonra hata ekranı göster
+    writeNextLine(0);
+
+    // 5 saniyede bir diğer kutuları sırayla başlat
+    setTimeout(() => writeNextLine(1), 5000);
+    setTimeout(() => writeNextLine(2), 10000);
+    setTimeout(() => writeNextLine(3), 15000);
+
+    // 20 saniye sonra ERROR göster
     setTimeout(() => {
       showError();
-    }, 10000);
+    }, 20000);
   });
-
 </script>
 
 </body>
