@@ -1,143 +1,237 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Şaka Terminal</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: black;
-      font-family: 'Courier New', monospace;
-      color: #00ff00;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Korku Terminal Şakası</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+    font-family: 'Share Tech Mono', monospace;
+    color: #00FF00;
+    animation: bgBlink 1s infinite alternate;
+  }
+
+  @keyframes bgBlink {
+    0% { background-color: black; }
+    50% { background-color: #330000; }
+    100% { background-color: black; }
+  }
+
+  #container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 15px;
+    height: 90vh;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .terminal {
+    background: #000000cc;
+    border: 3px solid #ff0000;
+    box-shadow:
+      0 0 10px #ff0000,
+      inset 0 0 20px #ff0000;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    font-size: 1.2em;
+    line-height: 1.3em;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    filter: drop-shadow(0 0 5px red);
+    text-shadow:
+      0 0 5px #ff0000,
+      0 0 10px #ff0000;
+  }
+
+  #errorBox {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5em;
+    color: red;
+    font-weight: 900;
+    text-shadow:
+      0 0 10px #ff0000,
+      0 0 30px #ff0000,
+      0 0 50px #ff0000,
+      0 0 100px #ff0000;
+    animation: errorBlink 1s infinite;
+    display: none;
+    user-select: none;
+    pointer-events: none;
+    z-index: 999;
+  }
+  @keyframes errorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  #maskImg {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 60px;
+    opacity: 0.4;
+    filter: drop-shadow(0 0 8px red);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  #startBtn {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.8em;
+    background: red;
+    border: none;
+    padding: 15px 40px;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 0 15px red;
+    user-select: none;
+    transition: background 0.3s ease;
+    z-index: 1000;
+  }
+  #startBtn:hover {
+    background: darkred;
+  }
+
+  /* Glitch Effect for terminal text */
+  .glitch {
+    position: relative;
+    color: #00ff00;
+  }
+  .glitch::before,
+  .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    width: 100%;
+    opacity: 0.8;
+    clip: rect(0, 900px, 0, 0);
+  }
+  .glitch::before {
+    animation: glitchTop 1s infinite linear alternate-reverse;
+    color: #ff0000;
+    z-index: 1;
+  }
+  .glitch::after {
+    animation: glitchBottom 1s infinite linear alternate-reverse;
+    color: #00ffff;
+    z-index: 2;
+  }
+  @keyframes glitchTop {
+    0% {
+      clip: rect(0, 900px, 5px, 0);
+      transform: translate(-2px, -2px);
     }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 20px;
-      width: 90%;
-      height: 80%;
+    50% {
+      clip: rect(10px, 900px, 15px, 0);
+      transform: translate(2px, 2px);
     }
-    .terminal {
-      background-color: #000;
-      border: 2px solid #00ff00;
-      padding: 10px;
-      box-shadow: 0 0 10px #00ff00;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      font-size: 1em;
+    100% {
+      clip: rect(0, 900px, 5px, 0);
+      transform: translate(-2px, -2px);
     }
-    .output {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      flex: 1;
-      overflow-y: auto;
+  }
+  @keyframes glitchBottom {
+    0% {
+      clip: rect(15px, 900px, 25px, 0);
+      transform: translate(2px, 2px);
     }
-    .center-error {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 3em;
-      color: red;
-      display: none;
-      animation: blink 1s infinite;
+    50% {
+      clip: rect(5px, 900px, 10px, 0);
+      transform: translate(-2px, -2px);
     }
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0; }
-      100% { opacity: 1; }
+    100% {
+      clip: rect(15px, 900px, 25px, 0);
+      transform: translate(2px, 2px);
     }
-    button {
-      position: absolute;
-      bottom: 30px;
-      font-size: 1.5em;
-      padding: 10px 20px;
-      background: red;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 8px;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div class="grid">
-    <div class="terminal"><div class="output" id="term1"></div></div>
-    <div class="terminal"><div class="output" id="term2"></div></div>
-    <div class="terminal"><div class="output" id="term3"></div></div>
-    <div class="terminal"><div class="output" id="term4"></div></div>
+  <div id="container">
+    <div class="terminal" id="term1"><img id="maskImg" src="https://i.ibb.co/1RbCzdr/hack-mask1.png" alt="Hack Mask" /> <pre class="glitch" data-text=""></pre></div>
+    <div class="terminal" id="term2"><img id="maskImg" src="https://i.ibb.co/1RbCzdr/hack-mask2.png" alt="Hack Mask" /> <pre class="glitch" data-text=""></pre></div>
+    <div class="terminal" id="term3"><img id="maskImg" src="https://i.ibb.co/1RbCzdr/hack-mask3.png" alt="Hack Mask" /> <pre class="glitch" data-text=""></pre></div>
+    <div class="terminal" id="term4"><img id="maskImg" src="https://i.ibb.co/1RbCzdr/hack-mask4.png" alt="Hack Mask" /> <pre class="glitch" data-text=""></pre></div>
   </div>
 
+  <div id="errorBox">ERROR</div>
+
   <button id="startBtn">Çıkış</button>
-  <div class="center-error" id="errorText">ERROR</div>
 
-  <script>
-    const messages = [
-      "Virüs yükleniyor...",
-      "Sistem dosyaları siliniyor...",
-      "IP adresi izleniyor...",
-      "Kamera erişimi sağlandı...",
-      "Veriler sızdırılıyor...",
-      "Sistem çökertiliyor...",
-      "Şifre çözümleniyor...",
-      "Sistem uyarı veriyor...",
-      "Ağ izleniyor...",
-      "ROOT erişimi sağlandı..."
-    ];
+<script>
+  const texts = [
+    "VIRUS YÜKLENİYOR...",
+    "HESAP İÇİ VERİLER SİLİNİYOR...",
+    "IP ADRESİ BULUNUYOR...",
+    "ŞİFRELER ELE GEÇİRİLİYOR...",
+    "SİSTEME GİRİŞ SAĞLANDI...",
+    "VERİLER ÇALINIYOR...",
+    "FİREWALL DEVRE DIŞI...",
+    "KORUMA SİSTEMİ KAPANDI...",
+    "HESAP DURUMU: TEHLİKEDE",
+    "SİSTEM ÇÖKÜYOR..."
+  ];
 
-    const terminals = [
-      document.getElementById('term1'),
-      document.getElementById('term2'),
-      document.getElementById('term3'),
-      document.getElementById('term4')
-    ];
+  function randomText() {
+    return texts[Math.floor(Math.random() * texts.length)];
+  }
 
-    let counters = [0, 0, 0, 0];
-    const maxLines = 1000;
-    const delay = 30;
+  const termEls = [
+    document.querySelector("#term1 pre"),
+    document.querySelector("#term2 pre"),
+    document.querySelector("#term3 pre"),
+    document.querySelector("#term4 pre")
+  ];
 
-    function writeToTerminal(index) {
-      if (counters[index] >= maxLines) return;
+  let currentTerm = 0;
+  let linesWritten = 0;
+  const maxLinesPerTerm = 1000; // 1000 yazı
+  const startDelay = 50; // ms yazı hızı (daha yavaş)
+  const errorBox = document.getElementById("errorBox");
+  const startBtn = document.getElementById("startBtn");
+  let started = false;
 
-      const msg = messages[Math.floor(Math.random() * messages.length)];
-      terminals[index].textContent += `\n${msg}`;
-      counters[index]++;
-
-      // Otomatik scroll
-      terminals[index].scrollTop = terminals[index].scrollHeight;
-
-      // Diğer kutuların başlaması
-      if (index < 3 && counters[index] === 20) {
-        startTerminal(index + 1);
+  function writeLine(termIndex, line) {
+    return new Promise(resolve => {
+      let i = 0;
+      const pre = termEls[termIndex];
+      const fullText = line + "\n";
+      function type() {
+        if (i < fullText.length) {
+          pre.textContent += fullText.charAt(i);
+          i++;
+          setTimeout(type, 10);
+        } else {
+          resolve();
+        }
       }
-
-      // ERROR gösterme
-      if (counters.every(c => c >= maxLines)) {
-        document.getElementById('errorText').style.display = 'block';
-      } else {
-        setTimeout(() => writeToTerminal(index), delay);
-      }
-    }
-
-    function startTerminal(index) {
-      writeToTerminal(index);
-    }
-
-    document.getElementById('startBtn').addEventListener('click', () => {
-      document.getElementById('startBtn').style.display = 'none';
-      startTerminal(0);
+      type();
     });
-  </script>
-</body>
-</html>
+  }
+
+  async function runTerminals() {
+    if(started) return;
+    started = true;
+    startBtn.disabled = true;
+
+    for(let termIndex=0; termIndex < termEls.length; termIndex++) {
+      linesWritten = 0;
+      while(linesWritten < maxLinesPerTerm) {
+        await writeLine(termIndex, randomText());
+        linesWritten++;
+        if(termIndex === 0 && linesWritten === 20)
