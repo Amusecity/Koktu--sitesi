@@ -3,191 +3,253 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Korku Sitesi</title>
+<title>Instagram Karmaşık Site</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+  /* Google Fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
 
+  * {
+    box-sizing: border-box;
+  }
   body {
     margin: 0;
-    height: 100vh;
-    background-color: black;
-    color: #00FF00;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(120deg, #833ab4, #fd1d1d, #fcb045);
+    background-size: 600% 600%;
+    animation: gradientBG 15s ease infinite;
+    color: white;
+    overflow-x: hidden;
+  }
+
+  @keyframes gradientBG {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
+  }
+
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 60px;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+  }
+  header img {
+    height: 40px;
+  }
+  nav {
+    margin-left: auto;
+    display: flex;
+    gap: 25px;
+  }
+  nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    font-size: 1.1rem;
+  }
+  nav a::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background: white;
+    transition: width 0.3s ease;
+  }
+  nav a:hover::after {
+    width: 100%;
+  }
+
+  main {
+    padding-top: 80px;
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  /* Profil Kartı */
+  .profile-card {
+    background: rgba(0,0,0,0.3);
+    border-radius: 15px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.3);
+    margin-bottom: 50px;
+  }
+  .profile-pic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid white;
+    background: url('https://randomuser.me/api/portraits/women/44.jpg') center/cover no-repeat;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px #fff;
+    transition: transform 0.3s ease;
+  }
+  .profile-pic:hover {
+    transform: scale(1.1) rotate(10deg);
+  }
+  .profile-info {
+    flex-grow: 1;
+  }
+  .profile-info h2 {
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    font-size: 2rem;
+  }
+  .profile-info p {
+    margin: 0 0 15px 0;
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  .profile-stats {
+    display: flex;
+    gap: 30px;
+    font-weight: 600;
+  }
+  .profile-stats div {
+    text-align: center;
+  }
+  .profile-stats div span {
+    display: block;
+    font-size: 1.4rem;
+  }
+
+  /* Hikayeler Kaydırıcı */
+  .stories {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    margin-bottom: 40px;
+    padding-bottom: 10px;
+  }
+  .story {
+    flex: 0 0 auto;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid white;
+    background: url('https://randomuser.me/api/portraits/men/32.jpg') center/cover no-repeat;
+    box-shadow: 0 0 10px white;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+    position: relative;
+  }
+  .story:nth-child(2) {
+    background-image: url('https://randomuser.me/api/portraits/women/47.jpg');
+  }
+  .story:nth-child(3) {
+    background-image: url('https://randomuser.me/api/portraits/men/76.jpg');
+  }
+  .story:nth-child(4) {
+    background-image: url('https://randomuser.me/api/portraits/women/54.jpg');
+  }
+  .story:nth-child(5) {
+    background-image: url('https://randomuser.me/api/portraits/men/88.jpg');
+  }
+  .story:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 20px #fff;
+    z-index: 10;
+  }
+
+  /* Gönderiler Bölümü */
+  .posts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 25px;
+  }
+  .post {
+    background: rgba(0,0,0,0.3);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    animation: blinkRed 1s infinite alternate;
   }
-
-  @keyframes blinkRed {
-    0% {
-      background-color: black;
-      color: #00FF00;
-      transform: translate(0, 0);
-    }
-    50% {
-      background-color: darkred;
-      color: yellow;
-      transform: translate(5px, -5px);
-    }
-    100% {
-      background-color: black;
-      color: #00FF00;
-      transform: translate(0, 0);
-    }
+  .post:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #fff;
   }
-
-  h1 {
-    margin: 10px 0 20px 0;
-    font-size: 2em;
-    color: red;
+  .post img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
   }
-
-  .terminal {
-    background: black;
-    border: 2px solid #00FF00;
-    padding: 20px;
-    width: 90vw;
-    max-width: 600px;
-    box-sizing: border-box;
-    box-shadow: 0 0 20px #00FF00;
-    position: relative;
-    font-size: 1.1em;
-    line-height: 1.3em;
+  .post-content {
+    padding: 15px;
   }
-
-  .terminal h2 {
-    margin: 0 0 10px 0;
-    font-size: 1.8em;
-    color: red;
+  .post-content h3 {
+    margin: 0 0 8px 0;
   }
-
-  .terminal pre {
+  .post-content p {
     margin: 0;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+    font-size: 0.9rem;
+    font-weight: 300;
   }
 
-  .skull {
-    position: absolute;
-    top: -50px;
-    right: 20px;
-    width: 60px;
-    filter: drop-shadow(0 0 10px red);
-    animation: skullFloat 3s ease-in-out infinite;
+  /* Scrollbar stil */
+  ::-webkit-scrollbar {
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
   }
 
-  @keyframes skullFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-  }
-
-  button {
-    margin-top: 30px;
-    font-size: 1.5em;
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    cursor: pointer;
-    border-radius: 6px;
-    user-select: none;
-    transition: background-color 0.3s;
-  }
-
-  button:hover {
-    background-color: darkred;
+  /* Responsive */
+  @media (max-width: 600px) {
+    .profile-card {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .profile-pic {
+      width: 100px;
+      height: 100px;
+    }
+    .profile-stats {
+      justify-content: center;
+    }
   }
 </style>
 </head>
 <body>
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/120px-Instagram_logo_2022.svg.png" alt="Instagram Logo" />
+    <nav>
+      <a href="#">Ana Sayfa</a>
+      <a href="#">Hakkında</a>
+      <a href="#">İletişim</a>
+    </nav>
+  </header>
 
-  <h1>Korku Sitesi</h1>
+  <main>
+    <section class="profile-card" aria-label="Instagram Profil Kartı">
+      <div class="profile-pic" aria-hidden="true"></div>
+      <div class="profile-info">
+        <h2>kullanici_adi</h2>
+        <p>Web geliştirici, fotoğraf tutkunu ve kahve sever ☕️</p>
+        <div class="profile-stats">
+          <div><span>1.2K</span> Takipçi</div>
+          <div><span>250</span> Takip</div>
+          <div><span>75</span> Gönderi</div>
+        </div>
+      </div>
+    </section>
 
-  <div class="terminal">
-    <h2>⚠️ SYSTEM BREACH DETECTED ⚠️</h2>
-    <pre>
->>> WARNING! VIRUS DETECTED IN SYSTEM <<<
-
-[*] Attempting to contain threat...
-[*] Virus spreading rapidly...
-[*] SYSTEM COMPROMISED!
-
-Please disconnect your device immediately!
-    </pre>
-    <img class="skull" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Skull_icon.svg/1024px-Skull_icon.svg.png" alt="Skull Icon" />
-  </div>
-
-  <button id="toggleBtn">Başlat</button>
-
-<script>
-  const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
-  audio.loop = true;
-
-  let vibrating = false;
-  let intervalId = null;
-  let openCount = 0;
-  const maxOpen = 100;
-
-  function vibratePattern() {
-    if (navigator.vibrate) {
-      navigator.vibrate([500, 200, 500]);
-    }
-  }
-
-  const urls = [
-    'https://example.com',
-    'https://en.wikipedia.org/wiki/Virus_(computing)',
-    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    'https://www.google.com/search?q=virus',
-    'https://www.bing.com/search?q=virus',
-    'https://www.cnet.com/tech/services-and-software/what-is-a-computer-virus/'
-  ];
-
-  function openRandomPage() {
-    if (openCount >= maxOpen) {
-      stop();
-      alert('100 site açıldı, işlem durduruldu.');
-      return;
-    }
-    const url = urls[Math.floor(Math.random() * urls.length)];
-    window.open(url, '_blank');
-    openCount++;
-  }
-
-  const btn = document.getElementById('toggleBtn');
-
-  function start() {
-    openCount = 0;
-    audio.play().catch(() => {
-      alert("Ses çalınamadı, lütfen sayfayı tıklayarak ses izni verin.");
-    });
-    intervalId = setInterval(() => {
-      vibratePattern();
-      openRandomPage();
-    }, 1000);
-    btn.textContent = "Kapat";
-  }
-
-  function stop() {
-    audio.pause();
-    audio.currentTime = 0;
-    if (navigator.vibrate) navigator.vibrate(0);
-    clearInterval(intervalId);
-    intervalId = null;
-    btn.textContent = "Başlat";
-  }
-
-  btn.addEventListener('click', () => {
-    if (intervalId === null) {
-      start();
-    } else {
-      stop();
-    }
-  });
-</script>
-
-</body>
-</html>
+    <section class="stories" aria
