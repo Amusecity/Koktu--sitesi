@@ -1,40 +1,52 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Korku Sitesi</title>
-<style>
-  body {
-    background: black;
-    color: lime;
-    font-family: monospace;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-    text-align: center;
-  }
-  button {
-    font-size: 2em;
-    padding: 15px 40px;
-    margin-top: 20px;
-    background: red;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  button:hover {
-    background: darkred;
-  }
-  pre {
-    max-width: 600px;
-    text-align: left;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Korku Sitesi</title>
+  <style>
+    body {
+      background: black;
+      color: lime;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      animation: blinkRed 1s infinite alternate;
+    }
+    @keyframes blinkRed {
+      0% { background-color: black; color: lime; }
+      50% { background-color: darkred; color: yellow; }
+      100% { background-color: black; color: lime; }
+    }
+    button {
+      font-size: 2em;
+      padding: 15px 40px;
+      margin-top: 20px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: darkred;
+    }
+    pre {
+      max-width: 90%;
+      max-height: 60vh;
+      overflow-y: auto;
+      text-align: left;
+      background: #000;
+      border: 2px solid lime;
+      padding: 15px;
+      box-shadow: 0 0 10px lime;
+    }
+  </style>
 </head>
 <body>
 
@@ -42,48 +54,68 @@
 
 <pre id="terminal">
 >>> WARNING! VIRUS DETECTED IN SYSTEM <<<
+
 [*] Attempting to contain threat...
 [*] Virus spreading rapidly...
 [*] SYSTEM COMPROMISED!
-Please disconnect your device immediately!
 </pre>
 
 <button id="startBtn">Kapat</button>
 
 <script>
-const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
-audio.loop = true;
+  const terminal = document.getElementById('terminal');
+  const button = document.getElementById('startBtn');
+  const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+  audio.loop = true;
 
-function vibratePattern() {
-  if(navigator.vibrate) {
-    navigator.vibrate([500,200,500,200,500]);
+  const messages = [
+    "[!] Injecting payload...",
+    "[!] Gaining root access...",
+    "[!] Encrypting files...",
+    "[!] Uploading data to server...",
+    "[!] Disabling firewall...",
+    "[!] Format C:\\...",
+    "[!] Bypassing login...",
+    "[!] Connecting to C&C server...",
+    "[!] Spreading to other devices...",
+    "[!] You are being watched...",
+    "[!] Sending location...",
+    "[!] Webcam activated...",
+    "[!] Microphone recording...",
+    "[!] Device locked!",
+    "[!] Shutting down...",
+  ];
+
+  function vibratePattern() {
+    if (navigator.vibrate) {
+      navigator.vibrate([500, 200, 500]);
+    }
   }
-}
 
-const urls = [
-  'https://example.com',
-  'https://en.wikipedia.org/wiki/Virus_(computing)',
-  'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-  'https://www.google.com/search?q=virus',
-  'https://www.bing.com/search?q=virus'
-];
+  function startTerminalFlow() {
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < messages.length) {
+        terminal.textContent += '\n' + messages[index];
+        terminal.scrollTop = terminal.scrollHeight; // Otomatik kaydır
+        index++;
+      } else {
+        terminal.textContent += '\n[!] SYSTEM DESTROYED.';
+        clearInterval(interval);
+      }
+    }, 100); // 100ms = çok hızlı
+  }
 
-let popupInterval;
-let vibrateInterval;
+  button.addEventListener('click', () => {
+    button.disabled = true;
+    button.textContent = 'Başlatıldı';
 
-document.getElementById('startBtn').addEventListener('click', () => {
-  audio.play().catch(e => console.log('Ses çalınamadı:', e));
-  vibratePattern();
-  vibrateInterval = setInterval(vibratePattern, 1000);
-  popupInterval = setInterval(() => {
-    let url = urls[Math.floor(Math.random()*urls.length)];
-    window.open(url, '_blank');
-  }, 1000);
-  // Butonu pasif yap
-  const btn = document.getElementById('startBtn');
-  btn.disabled = true;
-  btn.textContent = 'Başlatıldı';
-});
+    audio.play().catch(e => console.log('Ses oynatılamadı:', e));
+    vibratePattern();
+    setInterval(vibratePattern, 1500);
+
+    startTerminalFlow();
+  });
 </script>
 
 </body>
