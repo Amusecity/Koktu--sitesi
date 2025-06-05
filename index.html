@@ -11,170 +11,141 @@
     margin: 0; padding: 0;
     height: 100%;
     background: black;
-    overflow: hidden;
     font-family: 'Share Tech Mono', monospace;
-    color: #00FF00;
-    animation: bgBlink 1s infinite alternate;
-  }
-
-  @keyframes bgBlink {
-    0% { background-color: black; }
-    50% { background-color: #330000; }
-    100% { background-color: black; }
-  }
-
-  #container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 15px;
-    height: 90vh;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-
-  .terminal {
-    background: #000000cc;
-    border: 3px solid #ff0000;
-    box-shadow:
-      0 0 10px #ff0000,
-      inset 0 0 20px #ff0000;
-    padding: 20px;
-    position: relative;
     overflow: hidden;
-    font-size: 1.2em;
-    line-height: 1.3em;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    filter: drop-shadow(0 0 5px red);
-    text-shadow:
-      0 0 5px #ff0000,
-      0 0 10px #ff0000;
-  }
-
-  #errorBox {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 5em;
-    color: red;
-    font-weight: 900;
-    text-shadow:
-      0 0 10px #ff0000,
-      0 0 30px #ff0000,
-      0 0 50px #ff0000,
-      0 0 100px #ff0000;
-    animation: errorBlink 1s infinite;
-    display: none;
-    user-select: none;
-    pointer-events: none;
-    z-index: 999;
-  }
-  @keyframes errorBlink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  #maskImg {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 60px;
-    opacity: 0.4;
-    filter: drop-shadow(0 0 8px red);
-    user-select: none;
-    pointer-events: none;
   }
 
   #startBtn {
     position: fixed;
-    bottom: 20px; left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.8em;
-    background: red;
-    border: none;
-    padding: 15px 40px;
-    color: white;
-    font-weight: bold;
-    border-radius: 10px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3em;
+    background: darkred;
+    color: #ff0000;
+    border: 3px solid #ff0000;
+    padding: 20px 60px;
     cursor: pointer;
-    box-shadow: 0 0 15px red;
+    border-radius: 15px;
+    box-shadow: 0 0 20px #ff0000;
     user-select: none;
-    transition: background 0.3s ease;
-    z-index: 1000;
+    transition: background-color 0.3s ease;
   }
   #startBtn:hover {
-    background: darkred;
+    background-color: red;
   }
 
-  /* Glitch Effect for terminal text */
-  .glitch {
+  #container {
+    display: none;
+    height: 100vh;
+    width: 100vw;
+    padding: 15px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .terminal {
+    background: #000;
+    border: 3px solid #0f0;
+    box-shadow:
+      0 0 15px #0f0 inset,
+      0 0 20px #0f0;
+    padding: 20px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-size: 1.3em;
+    line-height: 1.2em;
+    color: #0f0;
     position: relative;
-    color: #00ff00;
   }
-  .glitch::before,
-  .glitch::after {
-    content: attr(data-text);
-    position: absolute;
-    left: 0;
-    width: 100%;
-    opacity: 0.8;
-    clip: rect(0, 900px, 0, 0);
+
+  .terminal.red {
+    border-color: #f00;
+    color: #f00;
+    box-shadow:
+      0 0 15px #f00 inset,
+      0 0 30px #f00;
   }
-  .glitch::before {
-    animation: glitchTop 1s infinite linear alternate-reverse;
-    color: #ff0000;
-    z-index: 1;
+
+  #errorBox {
+    display: none;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: #f00;
+    font-size: 6em;
+    font-weight: 900;
+    text-shadow:
+      0 0 15px #f00,
+      0 0 40px #f00,
+      0 0 70px #f00;
+    animation: blink 1s infinite alternate;
+    user-select: none;
+    pointer-events: none;
+    z-index: 9999;
   }
-  .glitch::after {
-    animation: glitchBottom 1s infinite linear alternate-reverse;
-    color: #00ffff;
-    z-index: 2;
+
+  @keyframes blink {
+    0%, 100% {opacity: 1;}
+    50% {opacity: 0.2;}
   }
-  @keyframes glitchTop {
+
+  .error-fly {
+    position: fixed;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #f00;
+    text-shadow: 0 0 5px #f00;
+    user-select: none;
+    pointer-events: none;
+    animation: flyIn 5s linear forwards;
+    opacity: 0;
+  }
+
+  @keyframes flyIn {
     0% {
-      clip: rect(0, 900px, 5px, 0);
-      transform: translate(-2px, -2px);
+      opacity: 0;
+      transform: translate(var(--x-start), var(--y-start)) scale(0.5);
     }
     50% {
-      clip: rect(10px, 900px, 15px, 0);
-      transform: translate(2px, 2px);
+      opacity: 1;
+      transform: translate(calc(var(--x-start) / 2), calc(var(--y-start) / 2)) scale(1);
     }
     100% {
-      clip: rect(0, 900px, 5px, 0);
-      transform: translate(-2px, -2px);
-    }
-  }
-  @keyframes glitchBottom {
-    0% {
-      clip: rect(15px, 900px, 25px, 0);
-      transform: translate(2px, 2px);
-    }
-    50% {
-      clip: rect(5px, 900px, 10px, 0);
-      transform: translate(-2px, -2px);
-    }
-    100% {
-      clip: rect(15px, 900px, 25px, 0);
-      transform: translate(2px, 2px);
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
     }
   }
 </style>
 </head>
 <body>
-  <div id="container">
-    <div class="terminal" id="term1"><img id="maskImg" src="https://i.ibb.co/1RbCzdr/hack-mask1.png" alt="Hack Mask" /> <pre class="glitch" data-text=""></pre></div>
-    <div class="terminal" id="term2"><img id="maskImg" src="https://i.ibb.co/1RbCzdr/hack-mask2.png" alt="Hack Mask" /> <pre class="glitch" data-text=""></pre></div>
-    <div class="terminal" id="term3"><img id="maskImg" src="https://i.ibb.co/1RbCzdr/hack-mask3.png" alt="Hack Mask" /> <pre class="glitch" data-text=""></pre></div>
-    <div class="terminal" id="term4"><img id="maskImg" src="https://i.ibb.co/1RbCzdr/hack-mask4.png" alt="Hack Mask" /> <pre class="glitch" data-text=""></pre></div>
-  </div>
 
-  <div id="errorBox">ERROR</div>
+<button id="startBtn">Çıkış</button>
 
-  <button id="startBtn">Çıkış</button>
+<div id="container">
+  <div class="terminal" id="term1"></div>
+  <div class="terminal red" id="term2"></div>
+  <div class="terminal" id="term3"></div>
+  <div class="terminal red" id="term4"></div>
+</div>
+
+<div id="errorBox">ERROR</div>
 
 <script>
-  const texts = [
+  const startBtn = document.getElementById('startBtn');
+  const container = document.getElementById('container');
+  const errorBox = document.getElementById('errorBox');
+  const terminals = [
+    document.getElementById('term1'),
+    document.getElementById('term2'),
+    document.getElementById('term3'),
+    document.getElementById('term4')
+  ];
+
+  const greenTexts = [
     "VIRUS YÜKLENİYOR...",
     "HESAP İÇİ VERİLER SİLİNİYOR...",
     "IP ADRESİ BULUNUYOR...",
@@ -187,51 +158,90 @@
     "SİSTEM ÇÖKÜYOR..."
   ];
 
-  function randomText() {
-    return texts[Math.floor(Math.random() * texts.length)];
-  }
-
-  const termEls = [
-    document.querySelector("#term1 pre"),
-    document.querySelector("#term2 pre"),
-    document.querySelector("#term3 pre"),
-    document.querySelector("#term4 pre")
+  const redTexts = [
+    "CRITICAL ERROR DETECTED...",
+    "SİSTEM ÇÖKÜYOR...",
+    "VERİLER KAYBOLDU...",
+    "KORUMA SİSTEMİ YOK EDİLDİ...",
+    "HESAP İÇİ VERİLERİN TAMAMI SİLİNDİ...",
+    "IP ADRESİ ELE GEÇİRİLDİ...",
+    "SİSTEME KIRMIZI ALARM VERİLDİ...",
+    "SİSTEM SALDIRI ALTINDA...",
+    "KULLANICI BLOKLANDI...",
+    "ERROR 0x000F!"
   ];
 
-  let currentTerm = 0;
-  let linesWritten = 0;
-  const maxLinesPerTerm = 1000; // 1000 yazı
-  const startDelay = 50; // ms yazı hızı (daha yavaş)
-  const errorBox = document.getElementById("errorBox");
-  const startBtn = document.getElementById("startBtn");
-  let started = false;
-
-  function writeLine(termIndex, line) {
-    return new Promise(resolve => {
-      let i = 0;
-      const pre = termEls[termIndex];
-      const fullText = line + "\n";
-      function type() {
-        if (i < fullText.length) {
-          pre.textContent += fullText.charAt(i);
-          i++;
-          setTimeout(type, 10);
-        } else {
-          resolve();
-        }
-      }
-      type();
-    });
+  function randomFrom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  async function runTerminals() {
-    if(started) return;
-    started = true;
-    startBtn.disabled = true;
+  // Yazı hız ayarı (ms)
+  const typingDelay = 20;
 
-    for(let termIndex=0; termIndex < termEls.length; termIndex++) {
-      linesWritten = 0;
-      while(linesWritten < maxLinesPerTerm) {
-        await writeLine(termIndex, randomText());
-        linesWritten++;
-        if(termIndex === 0 && linesWritten === 20)
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function writeLine(term, line) {
+    for(let i=0; i < line.length; i++) {
+      term.textContent += line.charAt(i);
+      await sleep(typingDelay);
+    }
+    term.textContent += "\n";
+  }
+
+  async function run() {
+    startBtn.style.display = 'none';
+    container.style.display = 'grid';
+
+    // Her terminal için 1000 yazı yaz, terminal 2 ve 4 kırmızı metinlerle
+    for(let i = 0; i < 1000; i++) {
+      for(let t=0; t < terminals.length; t++) {
+        let line;
+        if(t % 2 === 0) {
+          line = randomFrom(greenTexts);
+          terminals[t].style.color = '#0f0';
+          terminals[t].style.borderColor = '#0f0';
+          terminals[t].style.boxShadow = '0 0 15px #0f0 inset, 0 0 20px #0f0';
+        } else {
+          line = randomFrom(redTexts);
+          terminals[t].style.color = '#f00';
+          terminals[t].style.borderColor = '#f00';
+          terminals[t].style.boxShadow = '0 0 15px #f00 inset, 0 0 30px #f00';
+        }
+        await writeLine(terminals[t], line);
+      }
+    }
+
+    // Hata mesajı göster ve yanıp sönen efekt başlat
+    errorBox.style.display = 'block';
+
+    // Ekranın 4 tarafından rastgele ERROR yazıları uçuşuyor
+    createFlyingErrors(20);
+  }
+
+  function createFlyingErrors(count) {
+    for(let i=0; i < count; i++) {
+      const errorEl = document.createElement('div');
+      errorEl.classList.add('error-fly');
+      errorEl.textContent = 'ERROR';
+
+      // Rastgele başlangıç konumu (üst, alt, sağ, sol)
+      const side = Math.floor(Math.random() * 4);
+      let xStart, yStart;
+
+      switch(side) {
+        case 0: // üst
+          xStart = Math.random() * window.innerWidth + 'px';
+          yStart = '-50px';
+          break;
+        case 1: // alt
+          xStart = Math.random() * window.innerWidth + 'px';
+          yStart = window.innerHeight + 50 + 'px';
+          break;
+        case 2: // sol
+          xStart = '-150px';
+          yStart = Math.random() * window.innerHeight + 'px';
+          break;
+        case 3: // sağ
+          xStart = window.innerWidth + 150 + '
