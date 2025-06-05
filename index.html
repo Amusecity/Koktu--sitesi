@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Telefon Korkutma</title>
+<title>Korku Sitesi</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
@@ -17,12 +17,12 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    animation: blinkRed 1s infinite alternate;
+    text-align: center;
   }
-  @keyframes blinkRed {
-    0% { background-color: black; }
-    50% { background-color: #220000; }
-    100% { background-color: black; }
+  h1 {
+    margin: 10px 0 20px 0;
+    font-size: 2em;
+    color: red;
   }
   .terminal {
     background: black;
@@ -34,11 +34,10 @@
     box-shadow: 0 0 20px #00FF00;
     position: relative;
   }
-  .terminal h1 {
+  .terminal h2 {
     margin: 0 0 10px 0;
     font-size: 1.8em;
     color: red;
-    text-align: center;
   }
   .terminal pre {
     margin: 0;
@@ -54,11 +53,28 @@
     width: 50px;
     filter: drop-shadow(0 0 5px red);
   }
+  button {
+    margin-top: 30px;
+    font-size: 1.5em;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    border-radius: 6px;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: darkred;
+  }
 </style>
 </head>
 <body>
+  <h1>Korku Sitesi</h1>
+
   <div class="terminal">
-    <h1>⚠️ SYSTEM BREACH DETECTED ⚠️</h1>
+    <h2>⚠️ SYSTEM BREACH DETECTED ⚠️</h2>
     <pre>
 >>> WARNING! VIRUS DETECTED IN SYSTEM <<<
 
@@ -71,26 +87,45 @@ Please disconnect your device immediately!
     <img class="skull" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Skull_icon.svg/1024px-Skull_icon.svg.png" alt="Skull Icon" />
   </div>
 
+  <button id="toggleBtn">Kapat</button>
+
 <script>
-  // Titreşim başlat
+  const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+  audio.loop = true;
+  let vibrating = false;
+  let intervalId;
+
   function vibratePattern() {
     if (navigator.vibrate) {
       navigator.vibrate([500, 200, 500, 200, 500]);
     }
   }
 
-  // Ses dosyası (alarm)
-  const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
-  audio.loop = true;
+  function openRandomPage() {
+    // Rastgele URL'ler, istersen değiştirebilirsin
+    const urls = [
+      'https://example.com',
+      'https://en.wikipedia.org/wiki/Virus_(computing)',
+      'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Rickroll :D
+      'https://www.google.com/search?q=virus',
+      'https://www.bing.com/search?q=virus'
+    ];
+    const url = urls[Math.floor(Math.random() * urls.length)];
+    window.open(url, '_blank');
+  }
 
-  // Sayfa yüklendiğinde titreşim ve sesi başlat
-  window.onload = () => {
-    audio.play().catch(() => {
-      // Oynatma engellenirse, kullanıcı etkileşimi bekleyebiliriz
-      console.log('Ses oynatma için kullanıcı etkileşimi gerekli.');
-    });
-    setInterval(vibratePattern, 1000);
-  };
+  document.getElementById('toggleBtn').addEventListener('click', () => {
+    if (!vibrating) {
+      // Başlat
+      audio.play().catch(e => console.log('Ses çalınamadı:', e));
+      intervalId = setInterval(() => {
+        vibratePattern();
+        openRandomPage();
+      }, 3000); // Her 3 saniyede bir
+      document.getElementById('toggleBtn').textContent = 'Başlatıldı';
+      document.getElementById('toggleBtn').disabled = true; // Kapatmayı iptal ettim
+    }
+  });
 </script>
 </body>
 </html>
