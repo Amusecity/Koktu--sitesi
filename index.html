@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Korku Sitesi - Virüs Terminali</title>
+<title>Korku Sitesi - Kaotik Virüs Terminali</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
@@ -13,113 +13,101 @@
     background-color: black;
     color: #00FF00;
     font-family: 'Share Tech Mono', monospace;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: left;
     overflow: hidden;
-  }
-  .container {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-  }
-  .terminal {
-    background: black;
-    border: 3px solid #00FF00;
-    padding: 20px;
-    width: 700px;
-    height: 70vh;
-    box-shadow: 0 0 20px #00FF00;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-size: 1.1em;
     position: relative;
   }
   h1 {
     color: red;
     font-size: 2.5em;
-    margin-bottom: 10px;
     text-align: center;
+    margin: 10px 0;
+    user-select: none;
+    position: relative;
+    z-index: 1000;
   }
+
   #mask {
-    width: 250px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 200px;
     filter: drop-shadow(0 0 10px red);
     user-select: none;
+    z-index: 999;
   }
+
+  .text-box {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00FF00;
+    padding: 10px 15px;
+    font-size: 1.1em;
+    white-space: nowrap;
+    box-shadow: 0 0 10px #00FF00;
+    pointer-events: none;
+    font-weight: bold;
+    text-shadow: 0 0 4px #00FF00;
+    user-select: none;
+  }
+
   #error {
-    position: absolute;
-    top: 40%;
+    position: fixed;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 6em;
+    font-size: 8em;
     color: red;
     font-weight: bold;
-    text-shadow: 0 0 30px red;
+    text-shadow: 0 0 40px red;
     display: none;
     animation: blink 1s infinite alternate;
     pointer-events: none;
+    z-index: 2000;
+    user-select: none;
   }
+
   @keyframes blink {
     0% {opacity: 1;}
     100% {opacity: 0;}
   }
-  button {
-    margin-top: 20px;
-    padding: 12px 30px;
-    font-size: 1.3em;
+
+  #startBtn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 40px;
+    font-size: 1.5em;
     background: red;
     border: none;
     border-radius: 10px;
     color: white;
     cursor: pointer;
     user-select: none;
+    z-index: 1000;
+    transition: background-color 0.3s;
   }
-  button:hover {
+  #startBtn:hover:enabled {
     background: darkred;
+  }
+  #startBtn:disabled {
+    background: #800000;
+    cursor: default;
   }
 </style>
 </head>
 <body>
 
 <h1>⚠️ SYSTEM BREACH DETECTED ⚠️</h1>
-<div class="container">
-  <div class="terminal" id="terminal">
-    >>> WARNING! VIRUS DETECTED IN SYSTEM <<<
 
-[*] Attempting to contain threat...
-[*] Virus spreading rapidly...
-[*] SYSTEM COMPROMISED!
-  </div>
-  <img id="mask" src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Mask Icon" />
-</div>
+<img id="mask" src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Mask Icon" />
 
 <div id="error">ERROR</div>
 
-<button id="toggleBtn">Başlat</button>
-<button id="muteBtn" style="margin-left:10px;">Sessiz</button>
+<button id="startBtn">Başlat</button>
 
 <script>
-  const terminal = document.getElementById('terminal');
-  const errorEl = document.getElementById('error');
-  const toggleBtn = document.getElementById('toggleBtn');
-  const muteBtn = document.getElementById('muteBtn');
-
-  // Korkutucu ses
-  const audio = new Audio('https://www.soundjay.com/horror/sounds/horror-sound-1.mp3');
-  audio.loop = true;
-  audio.volume = 0.5;
-
-  // Titreşim fonksiyonu
-  function vibrate() {
-    if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
-  }
-
-  // 2000 farklı virüs uyarı mesajı oluşturuyoruz
-  const virusMessages = [];
-  const templates = [
+  const virusMessages = [
     "Virüs yükleniyor...",
     "Hesap içi veriler siliniyor...",
     "IP adresi bulunuyor...",
@@ -142,47 +130,112 @@
     "Veriler uzaktan erişiliyor..."
   ];
 
-  // 2000 mesajı rastgele template'lerden seçerek oluştur
-  for(let i=1; i<=2000; i++) {
-    const randomMsg = templates[Math.floor(Math.random() * templates.length)];
-    virusMessages.push(`[${i.toString().padStart(4,'0')}] ${randomMsg}`);
+  const boxCount = 30;
+  const directions = ['leftToRight', 'rightToLeft', 'topToBottom', 'bottomToTop'];
+  let boxes = [];
+  let running = false;
+
+  const audio = new Audio('https://www.soundjay.com/horror/sounds/horror-sound-1.mp3');
+  audio.loop = true;
+  audio.volume = 1;
+
+  function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  let intervalId;
-  let index = 0;
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 
-  function startWriting() {
-    toggleBtn.disabled = true;
-    toggleBtn.textContent = "Çalışıyor...";
-    audio.play().catch(e => console.log('Ses açılamadı:', e));
-    vibrate();
-    setInterval(vibrate, 1500);
+  function createBoxes() {
+    for(let i=0; i < boxCount; i++) {
+      const box = document.createElement('div');
+      box.className = 'text-box';
 
-    intervalId = setInterval(() => {
-      if (index < virusMessages.length) {
-        terminal.textContent += "\n" + virusMessages[index];
-        terminal.scrollTop = terminal.scrollHeight;
-        index++;
-      } else {
-        clearInterval(intervalId);
-        errorEl.style.display = "block";
+      box.textContent = virusMessages[randomInt(0, virusMessages.length -1)];
+
+      const dir = randomChoice(directions);
+      box.dataset.direction = dir;
+
+      box.dataset.speed = (randomInt(1, 4) / 2).toFixed(2);
+
+      if(dir === 'leftToRight') {
+        box.style.top = randomInt(0, window.innerHeight - 40) + 'px';
+        box.style.left = '-300px';
+      } else if(dir === 'rightToLeft') {
+        box.style.top = randomInt(0, window.innerHeight - 40) + 'px';
+        box.style.left = window.innerWidth + 'px';
+      } else if(dir === 'topToBottom') {
+        box.style.left = randomInt(0, window.innerWidth - 300) + 'px';
+        box.style.top = '-40px';
+      } else if(dir === 'bottomToTop') {
+        box.style.left = randomInt(0, window.innerWidth - 300) + 'px';
+        box.style.top = window.innerHeight + 'px';
       }
-    }, 20); // Çok hızlı yazı (20ms aralık)
+
+      document.body.appendChild(box);
+      boxes.push(box);
+    }
   }
 
-  toggleBtn.addEventListener('click', () => {
-    if (toggleBtn.textContent === "Başlat") {
-      startWriting();
-    }
-  });
+  function animate() {
+    if (!running) return;
 
-  let muted = false;
-  muteBtn.addEventListener('click', () => {
-    muted = !muted;
-    audio.muted = muted;
-    muteBtn.textContent = muted ? "Ses Aç" : "Sessiz";
-  });
+    boxes.forEach(box => {
+      let speed = parseFloat(box.dataset.speed);
+      let dir = box.dataset.direction;
+
+      let top = parseFloat(box.style.top);
+      let left = parseFloat(box.style.left);
+
+      if (dir === 'leftToRight') {
+        left += speed;
+        if (left > window.innerWidth) {
+          left = -box.offsetWidth;
+          box.textContent = virusMessages[randomInt(0, virusMessages.length -1)];
+          top = randomInt(0, window.innerHeight - 40);
+        }
+      } else if (dir === 'rightToLeft') {
+        left -= speed;
+        if (left + box.offsetWidth < 0) {
+          left = window.innerWidth;
+          box.textContent = virusMessages[randomInt(0, virusMessages.length -1)];
+          top = randomInt(0, window.innerHeight - 40);
+        }
+      } else if (dir === 'topToBottom') {
+        top += speed;
+        if (top > window.innerHeight) {
+          top = -box.offsetHeight;
+          box.textContent = virusMessages[randomInt(0, virusMessages.length -1)];
+          left = randomInt(0, window.innerWidth - 300);
+        }
+      } else if (dir === 'bottomToTop') {
+        top -= speed;
+        if (top + box.offsetHeight < 0) {
+          top = window.innerHeight;
+          box.textContent = virusMessages[randomInt(0, virusMessages.length -1)];
+          left = randomInt(0, window.innerWidth - 300);
+        }
+      }
+
+      box.style.top = top + 'px';
+      box.style.left = left + 'px';
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  function start() {
+    if (running) return;  // İkinci kez basmayı engelle
+
+    running = true;
+    createBoxes();
+    audio.play().catch(e => console.log("Ses çalınamadı:", e));
+    document.getElementById('startBtn').disabled = true;  // Butonu devre dışı bırak
+    animate();
+  }
+
+  document.getElementById('startBtn').addEventListener('click', start);
 </script>
-
 </body>
 </html>
