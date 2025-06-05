@@ -1,63 +1,65 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Korku Sitesi</title>
-  <style>
-    body {
-      background: black;
-      color: lime;
-      font-family: monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
-      animation: blinkRed 1s infinite alternate;
-    }
-    @keyframes blinkRed {
-      0% { background-color: black; color: lime; }
-      50% { background-color: darkred; color: yellow; }
-      100% { background-color: black; color: lime; }
-    }
-    button {
-      font-size: 2em;
-      padding: 15px 40px;
-      margin-top: 20px;
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: darkred;
-    }
-    pre {
-      max-width: 90%;
-      max-height: 60vh;
-      overflow-y: auto;
-      text-align: left;
-      background: #000;
-      border: 2px solid lime;
-      padding: 15px;
-      box-shadow: 0 0 10px lime;
-    }
-    #errorMessage {
-      display: none;
-      font-size: 2em;
-      color: red;
-      margin-top: 20px;
-      text-shadow: 0 0 10px red;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Korku Sitesi - Terminal</title>
+<style>
+  body {
+    background: black;
+    color: #00FF00;
+    font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  pre {
+    background: black;
+    border: 2px solid #00FF00;
+    padding: 20px;
+    width: 90vw;
+    max-width: 700px;
+    height: 60vh;
+    overflow-y: auto;
+    box-shadow: 0 0 10px #00FF00;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 1.1em;
+  }
+  #error {
+    display: none;
+    font-size: 5em;
+    color: red;
+    font-weight: bold;
+    text-shadow: 0 0 20px red;
+    animation: blink 1s infinite alternate;
+    margin-top: 30px;
+  }
+  @keyframes blink {
+    0% {opacity: 1;}
+    100% {opacity: 0;}
+  }
+  button {
+    margin-top: 20px;
+    font-size: 1.5em;
+    padding: 10px 30px;
+    background: red;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+  button:disabled {
+    background: darkred;
+    cursor: not-allowed;
+  }
+</style>
 </head>
 <body>
-
-<h1>⚠️ SYSTEM BREACH DETECTED ⚠️</h1>
 
 <pre id="terminal">
 >>> WARNING! VIRUS DETECTED IN SYSTEM <<<
@@ -67,78 +69,57 @@
 [*] SYSTEM COMPROMISED!
 </pre>
 
-<div id="errorMessage">💥 SYSTEM ERROR! 💥</div>
+<div id="error">ERROR</div>
 
-<button id="startBtn">Kapat</button>
+<button id="toggleBtn">Kapat</button>
 
 <script>
   const terminal = document.getElementById('terminal');
-  const errorMessage = document.getElementById('errorMessage');
-  const button = document.getElementById('startBtn');
-  const audio = new Audio('https://www.soundjay.com/human/sounds/scream-01.mp3'); // KORKUNÇ SES
+  const errorEl = document.getElementById('error');
+  const btn = document.getElementById('toggleBtn');
+
+  // Korkunç ses, loop açık
+  const audio = new Audio('https://www.soundjay.com/human/sounds/scream-01.mp3');
   audio.loop = true;
 
-  const messages = [
-    "[!] Injecting payload...",
-    "[!] Gaining root access...",
-    "[!] Encrypting files...",
-    "[!] Uploading data to remote server...",
-    "[!] Disabling security protocols...",
-    "[!] Accessing system32...",
-    "[!] Formatting disk C:...",
-    "[!] Spamming user contacts...",
-    "[!] Uploading device location...",
-    "[!] Activating microphone...",
-    "[!] Activating front camera...",
-    "[!] Tracking keystrokes...",
-    "[!] Hijacking browser...",
-    "[!] Flooding memory...",
-    "[!] Overwriting bootloader...",
-    "[!] Blocking system updates...",
-    "[!] Creating backdoor...",
-    "[!] Installing ransomware...",
-    "[!] Disabling antivirus...",
-    "[!] Executing rootkit...",
-    "[!] Spreading to nearby devices...",
-    "[!] Device overheating...",
-    "[!] CPU overload!",
-    "[!] Memory leak detected...",
-    "[!] Unexpected behavior detected...",
-    "[!] Disconnecting network...",
-    "[!] Remote shell active...",
-    "[!] FINAL STAGE ACTIVATED..."
-  ];
-
-  function vibratePattern() {
-    if (navigator.vibrate) {
-      navigator.vibrate([500, 200, 500]);
-    }
+  // Titreşim fonksiyonu
+  function vibrate() {
+    if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
   }
 
-  function startTerminalFlow() {
-    let index = 0;
-    const interval = setInterval(() => {
-      if (index < messages.length) {
-        terminal.textContent += '\n' + messages[index];
+  // 500 farklı mesaj üretelim (örnek olarak sistem mesajları)
+  const messages = [];
+  for(let i=1; i<=500; i++) {
+    messages.push(`[!] Malicious operation #${i} executing...`);
+  }
+
+  let intervalId;
+
+  function startWriting() {
+    let idx = 0;
+    btn.disabled = true;
+    btn.textContent = "Başlatıldı";
+
+    audio.play().catch(e=>console.log("Ses açılamadı:", e));
+    vibrate();
+    setInterval(vibrate, 1500);
+
+    intervalId = setInterval(() => {
+      if (idx < messages.length) {
+        terminal.textContent += "\n" + messages[idx];
         terminal.scrollTop = terminal.scrollHeight;
-        index++;
+        idx++;
       } else {
-        clearInterval(interval);
-        terminal.textContent += "\n\n[✖] Critical failure in system kernel!";
-        errorMessage.style.display = 'block';
+        clearInterval(intervalId);
+        errorEl.style.display = "block";
       }
-    }, 100);
+    }, 30);
   }
 
-  button.addEventListener('click', () => {
-    button.disabled = true;
-    button.textContent = 'Başlatıldı';
-
-    audio.play().catch(e => console.log('Ses oynatılamadı:', e));
-    vibratePattern();
-    setInterval(vibratePattern, 1500);
-
-    startTerminalFlow();
+  btn.addEventListener('click', () => {
+    if(btn.textContent === "Kapat") {
+      startWriting();
+    }
   });
 </script>
 
