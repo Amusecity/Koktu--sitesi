@@ -65,8 +65,12 @@
     user-select: none;
     transition: background-color 0.3s;
   }
-  button:hover {
+  button:hover:not(:disabled) {
     background-color: darkred;
+  }
+  button:disabled {
+    background-color: gray;
+    cursor: not-allowed;
   }
 </style>
 </head>
@@ -81,8 +85,6 @@
 [*] Attempting to contain threat...
 [*] Virus spreading rapidly...
 [*] SYSTEM COMPROMISED!
-[*] AMUSECİTY HACK TİME
-[*] BU SON UYARI !!!                                        
 
 Please disconnect your device immediately!
     </pre>
@@ -96,6 +98,8 @@ Please disconnect your device immediately!
   audio.loop = true;
   let vibrating = false;
   let intervalId;
+  let openCount = 0;
+  const maxOpen = 100;
 
   function vibratePattern() {
     if (navigator.vibrate) {
@@ -104,7 +108,6 @@ Please disconnect your device immediately!
   }
 
   function openRandomPage() {
-    // Rastgele URL'ler, istersen değiştirebilirsin
     const urls = [
       'https://example.com',
       'https://en.wikipedia.org/wiki/Virus_(computing)',
@@ -118,38 +121,22 @@ Please disconnect your device immediately!
 
   document.getElementById('toggleBtn').addEventListener('click', () => {
     if (!vibrating) {
-      // Başlat
+      vibrating = true;
       audio.play().catch(e => console.log('Ses çalınamadı:', e));
       intervalId = setInterval(() => {
         vibratePattern();
-        openRandomPage();
-      }, 3000); // Her 3 saniyede bir
-      document.getElementById('toggleBtn').textContent = 'Başlatıldı';
-      document.getElementById('toggleBtn').disabled = true; // Kapatmayı iptal ettim
+        if (openCount < maxOpen) {
+          openRandomPage();
+          openCount++;
+        } else {
+          clearInterval(intervalId);
+        }
+      }, 1000); // 1 saniye arayla aç
+      const btn = document.getElementById('toggleBtn');
+      btn.textContent = 'Başlatıldı';
+      btn.disabled = true; // bir kez tıklanıp kapandıktan sonra devre dışı kalsın
     }
   });
 </script>
 </body>
 </html>
-
-let count = 0;
-const maxCount = 100;
-const interval = 1000; // 1 saniye
-
-const urls = [
-  'https://example.com',
-  'https://en.wikipedia.org/wiki/Virus_(computing)',
-  'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-  'https://www.google.com/search?q=virus',
-  'https://www.bing.com/search?q=virus'
-];
-
-const intervalId = setInterval(() => {
-  if (count >= maxCount) {
-    clearInterval(intervalId);
-    return;
-  }
-  const url = urls[Math.floor(Math.random() * urls.length)];
-  window.open(url, '_blank');
-  count++;
-}, interval);  
