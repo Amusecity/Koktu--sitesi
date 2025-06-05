@@ -3,41 +3,64 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Korku Sitesi - Terminal</title>
+<title>Korku Sitesi - Virüs Terminali</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
   body {
-    background: black;
+    margin: 0;
+    height: 100vh;
+    background-color: black;
     color: #00FF00;
-    font-family: monospace;
+    font-family: 'Share Tech Mono', monospace;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    justify-content: center;
+    text-align: left;
     overflow: hidden;
   }
-  pre {
+  .container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .terminal {
     background: black;
-    border: 2px solid #00FF00;
+    border: 3px solid #00FF00;
     padding: 20px;
-    width: 90vw;
-    max-width: 700px;
-    height: 60vh;
+    width: 700px;
+    height: 70vh;
+    box-shadow: 0 0 20px #00FF00;
     overflow-y: auto;
-    box-shadow: 0 0 10px #00FF00;
     white-space: pre-wrap;
     word-wrap: break-word;
     font-size: 1.1em;
+    position: relative;
+  }
+  h1 {
+    color: red;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  #mask {
+    width: 250px;
+    filter: drop-shadow(0 0 10px red);
+    user-select: none;
   }
   #error {
-    display: none;
-    font-size: 5em;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 6em;
     color: red;
     font-weight: bold;
-    text-shadow: 0 0 20px red;
+    text-shadow: 0 0 30px red;
+    display: none;
     animation: blink 1s infinite alternate;
-    margin-top: 30px;
+    pointer-events: none;
   }
   @keyframes blink {
     0% {opacity: 1;}
@@ -45,81 +68,119 @@
   }
   button {
     margin-top: 20px;
-    font-size: 1.5em;
-    padding: 10px 30px;
+    padding: 12px 30px;
+    font-size: 1.3em;
     background: red;
     border: none;
+    border-radius: 10px;
     color: white;
     cursor: pointer;
-    border-radius: 8px;
+    user-select: none;
   }
-  button:disabled {
+  button:hover {
     background: darkred;
-    cursor: not-allowed;
   }
 </style>
 </head>
 <body>
 
-<pre id="terminal">
->>> WARNING! VIRUS DETECTED IN SYSTEM <<<
+<h1>⚠️ SYSTEM BREACH DETECTED ⚠️</h1>
+<div class="container">
+  <div class="terminal" id="terminal">
+    >>> WARNING! VIRUS DETECTED IN SYSTEM <<<
 
 [*] Attempting to contain threat...
 [*] Virus spreading rapidly...
 [*] SYSTEM COMPROMISED!
-</pre>
+  </div>
+  <img id="mask" src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Mask Icon" />
+</div>
 
 <div id="error">ERROR</div>
 
-<button id="toggleBtn">Kapat</button>
+<button id="toggleBtn">Başlat</button>
+<button id="muteBtn" style="margin-left:10px;">Sessiz</button>
 
 <script>
   const terminal = document.getElementById('terminal');
   const errorEl = document.getElementById('error');
-  const btn = document.getElementById('toggleBtn');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const muteBtn = document.getElementById('muteBtn');
 
-  // Korkunç ses, loop açık
-  const audio = new Audio('https://www.soundjay.com/human/sounds/scream-01.mp3');
+  // Korkutucu ses
+  const audio = new Audio('https://www.soundjay.com/horror/sounds/horror-sound-1.mp3');
   audio.loop = true;
+  audio.volume = 0.5;
 
   // Titreşim fonksiyonu
   function vibrate() {
     if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
   }
 
-  // 500 farklı mesaj üretelim (örnek olarak sistem mesajları)
-  const messages = [];
-  for(let i=1; i<=500; i++) {
-    messages.push(`[!] Malicious operation #${i} executing...`);
+  // 2000 farklı virüs uyarı mesajı oluşturuyoruz
+  const virusMessages = [];
+  const templates = [
+    "Virüs yükleniyor...",
+    "Hesap içi veriler siliniyor...",
+    "IP adresi bulunuyor...",
+    "Sistem dosyaları zarar görüyor...",
+    "Şifreler kırılıyor...",
+    "Gizli bilgiler çalınıyor...",
+    "RAM doluyor...",
+    "Arka kapı açılıyor...",
+    "Sistem kapanıyor...",
+    "Yetkisiz erişim tespit edildi...",
+    "Dosyalar şifreleniyor...",
+    "Veri tabanı bozuluyor...",
+    "Firewall devre dışı bırakılıyor...",
+    "Trojan aktif hale getiriliyor...",
+    "Payload yüklendi...",
+    "Kötü amaçlı komut çalıştırılıyor...",
+    "Sistem kayıtları siliniyor...",
+    "Kullanıcı hesapları ele geçiriliyor...",
+    "Şifre kurtarılıyor...",
+    "Veriler uzaktan erişiliyor..."
+  ];
+
+  // 2000 mesajı rastgele template'lerden seçerek oluştur
+  for(let i=1; i<=2000; i++) {
+    const randomMsg = templates[Math.floor(Math.random() * templates.length)];
+    virusMessages.push(`[${i.toString().padStart(4,'0')}] ${randomMsg}`);
   }
 
   let intervalId;
+  let index = 0;
 
   function startWriting() {
-    let idx = 0;
-    btn.disabled = true;
-    btn.textContent = "Başlatıldı";
-
-    audio.play().catch(e=>console.log("Ses açılamadı:", e));
+    toggleBtn.disabled = true;
+    toggleBtn.textContent = "Çalışıyor...";
+    audio.play().catch(e => console.log('Ses açılamadı:', e));
     vibrate();
     setInterval(vibrate, 1500);
 
     intervalId = setInterval(() => {
-      if (idx < messages.length) {
-        terminal.textContent += "\n" + messages[idx];
+      if (index < virusMessages.length) {
+        terminal.textContent += "\n" + virusMessages[index];
         terminal.scrollTop = terminal.scrollHeight;
-        idx++;
+        index++;
       } else {
         clearInterval(intervalId);
         errorEl.style.display = "block";
       }
-    }, 30);
+    }, 20); // Çok hızlı yazı (20ms aralık)
   }
 
-  btn.addEventListener('click', () => {
-    if(btn.textContent === "Kapat") {
+  toggleBtn.addEventListener('click', () => {
+    if (toggleBtn.textContent === "Başlat") {
       startWriting();
     }
+  });
+
+  let muted = false;
+  muteBtn.addEventListener('click', () => {
+    muted = !muted;
+    audio.muted = muted;
+    muteBtn.textContent = muted ? "Ses Aç" : "Sessiz";
   });
 </script>
 
