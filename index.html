@@ -2,49 +2,31 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>HACKLENDİN</title>
+  <title>ERROR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    * {
-      box-sizing: border-box;
-    }
     body {
       margin: 0;
       background: black;
-      color: #00ff00;
-      font-family: monospace;
       overflow: hidden;
-    }
-    #terminal {
-      padding: 10px;
-      height: 100vh;
-      white-space: pre-wrap;
-      overflow-y: auto;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 5px;
-      padding: 10px;
-      height: 100vh;
-      width: 100vw;
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: none;
+      font-family: monospace;
     }
     .box {
-      padding: 10px;
-      font-size: 12px;
+      position: absolute;
+      width: 30vw;
+      height: 25vh;
+      padding: 8px;
+      font-size: 11px;
       overflow: auto;
       white-space: pre-wrap;
+      box-shadow: 0 0 10px rgba(0,255,0,0.3);
     }
     .green { background: black; color: #00ff00; }
-    .red { background: #300; color: #ff4444; }
+    .red { background: #300; color: #ff5555; }
     .white { background: #eee; color: #111; }
+    .blue { background: #001133; color: #33aaff; }
     .black { background: #111; color: #fff; }
-    #finalScreen {
+    #final {
       display: none;
       position: fixed;
       top: 0; left: 0;
@@ -52,120 +34,102 @@
       height: 100vh;
       background: black;
       color: red;
+      font-size: 64px;
       text-align: center;
-      font-family: monospace;
-      z-index: 9999;
-    }
-    #finalScreen h1 {
-      font-size: 48px;
-      margin-top: 30vh;
+      line-height: 100vh;
+      font-weight: bold;
       animation: blink 0.6s infinite steps(1);
-    }
-    #mask {
-      font-size: 80px;
-      color: white;
-      margin-top: 30px;
-      animation: blink 0.8s infinite steps(1);
+      z-index: 999;
     }
     @keyframes blink {
       50% { opacity: 0; }
     }
+    .exclam {
+      position: absolute;
+      color: red;
+      font-size: 32px;
+      animation: blink 0.5s infinite steps(1);
+      z-index: 998;
+    }
   </style>
 </head>
 <body>
-  <div id="terminal"></div>
 
-  <div class="grid" id="grid">
-    <div class="box green" id="box1"></div>
-    <div class="box red" id="box2"></div>
-    <div class="box white" id="box3"></div>
-    <div class="box black" id="box4"></div>
-  </div>
+<div id="final">!!! ERROR !!!</div>
 
-  <div id="finalScreen">
-    <h1>!!! HACKLENDİN !!!</h1>
-    <div id="mask">
-      (͡° ͜ʖ ͡°)
-    </div>
-  </div>
+<audio id="startBeep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+<audio id="endBeep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
-  <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+<script>
+  const colors = ['green', 'red', 'white', 'blue', 'black'];
+  const lines = [
+    "Sistem çözümleniyor...",
+    "root erişimi: granted",
+    "Dosyalar siliniyor...",
+    "Port 443 açık...",
+    "Firewall baypas edildi...",
+    "Zararlı kod enjekte edildi...",
+    "Şifreler ele geçirildi...",
+    "RAM taranıyor...",
+    "Çekirdek kontrol altına alındı...",
+    "Ana işlemci yazılıyor...",
+  ];
 
-  <script>
-    const terminal = document.getElementById('terminal');
-    const grid = document.getElementById('grid');
-    const boxes = [
-      document.getElementById('box1'),
-      document.getElementById('box2'),
-      document.getElementById('box3'),
-      document.getElementById('box4')
-    ];
-    const finalScreen = document.getElementById('finalScreen');
-    const beep = document.getElementById('beep');
+  const boxes = [];
+  const startBeep = document.getElementById("startBeep");
+  const endBeep = document.getElementById("endBeep");
 
-    const firstLines = [
-      "Terminal başlatılıyor...",
-      "Güvenlik protokolü atlanıyor...",
-      "Yönetici erişimi alındı...",
-      "Ana sistem taranıyor...",
-      "Kritik modüller analiz ediliyor...",
-      "Veritabanı açılıyor...",
-      "Bağlantı noktaları taranıyor...",
-      "Zararlı kod enjekte edildi...",
-      "Sunucu kilitleniyor...",
-      "Sistem savunması çöktü."
-    ];
+  function createBox(i) {
+    const box = document.createElement("div");
+    box.className = `box ${colors[i % colors.length]}`;
+    const x = (i % 3) * 32 + 2;
+    const y = Math.floor(i / 3) * 28 + 2;
+    box.style.left = `${x}vw`;
+    box.style.top = `${y}vh`;
+    document.body.appendChild(box);
+    boxes.push(box);
+    fillBox(box);
+  }
 
-    const fakeData = [
-      "Kod çalışıyor...",
-      "root erişimi: granted",
-      "Dosyalar siliniyor...",
-      "Sistem kaynakları izleniyor...",
-      "Port 443 açık, sızılıyor...",
-      "Şifreler ele geçirildi...",
-      "Kernel belleği yazılıyor...",
-      "Log dosyaları değiştirildi...",
-      "Firewall baypas edildi...",
-      "Komut dosyası çalıştırılıyor..."
-    ];
+  function fillBox(box) {
+    let count = 0;
+    const interval = setInterval(() => {
+      const line = lines[Math.floor(Math.random() * lines.length)];
+      box.innerText += line + "\n";
+      box.scrollTop = box.scrollHeight;
+      count++;
+      if (count > 50) clearInterval(interval);
+    }, 60);
+  }
 
-    function delay(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+  function showExclamation() {
+    for (let i = 0; i < 30; i++) {
+      const span = document.createElement("div");
+      span.className = "exclam";
+      span.innerText = "!";
+      span.style.left = Math.random() * 100 + "vw";
+      span.style.top = Math.random() * 100 + "vh";
+      document.body.appendChild(span);
     }
+  }
 
-    async function startSequence() {
-      beep.play();
-      for (let i = 0; i < firstLines.length; i++) {
-        terminal.innerText += firstLines[i] + "\n";
-        terminal.scrollTop = terminal.scrollHeight;
-        await delay(500);
-      }
+  function showFinal() {
+    document.getElementById("final").style.display = "block";
+    endBeep.play();
+    showExclamation();
+  }
 
-      grid.style.display = 'grid';
-
-      const totalLines = 200;
-      let interval = 30 * 1000 / (totalLines + firstLines.length); // ~60ms
-
-      let counts = [0, 0, 0, 0];
-      let i = 0;
-      let intervalID = setInterval(() => {
-        const b = i % 4;
-        const line = fakeData[Math.floor(Math.random() * fakeData.length)];
-        boxes[b].innerText += line + "\n";
-        boxes[b].scrollTop = boxes[b].scrollHeight;
-        counts[b]++;
-        if (++i >= totalLines) {
-          clearInterval(intervalID);
-          setTimeout(showFinal, 1000);
-        }
-      }, interval);
+  async function run() {
+    startBeep.play();
+    for (let i = 0; i < 12; i++) {
+      createBox(i);
+      await new Promise(r => setTimeout(r, 1000));
     }
+    setTimeout(showFinal, 3000);
+  }
 
-    function showFinal() {
-      finalScreen.style.display = 'block';
-    }
+  run();
+</script>
 
-    window.onload = startSequence;
-  </script>
 </body>
 </html>
