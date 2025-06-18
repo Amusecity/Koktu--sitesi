@@ -13,24 +13,34 @@
       margin: 0;
       font-size: 16px;
       overflow: hidden;
+      position: relative;
     }
 
     #terminal {
       white-space: pre-wrap;
       overflow-y: auto;
-      height: calc(100vh - 120px);
+      height: calc(100vh - 150px);
       user-select: none;
+      padding-right: 10px;
     }
 
     .errorBox {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background-color: red;
       color: white;
       font-weight: bold;
       text-align: center;
-      padding: 20px;
+      padding: 40px 80px;
+      font-size: 48px;
       animation: blink 0.6s steps(1) infinite;
-      margin-top: 20px;
+      z-index: 10000;
       user-select: none;
+      box-shadow: 0 0 30px red;
+      border: 4px solid white;
+      letter-spacing: 10px;
     }
 
     @keyframes blink {
@@ -49,6 +59,12 @@
       margin-top: 20px;
       cursor: pointer;
       user-select: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10001;
+      border-radius: 5px;
     }
 
     #blackout {
@@ -72,7 +88,6 @@
       margin-left: 4px;
     }
 
-    /* Ekran titremesi için animasyon */
     @keyframes screenShake {
       0% {
         transform: translate(0, 0);
@@ -98,7 +113,6 @@
       animation: screenShake 0.4s linear 3;
     }
 
-    /* ASCII animasyon göz için */
     #asciiEye {
       font-family: monospace;
       color: #00ff00;
@@ -108,6 +122,19 @@
       white-space: pre;
       margin-top: 10px;
       animation: eyeBlink 4s steps(2) infinite;
+    }
+
+    /* ÜNLEM İŞARETLERİ ANİMASYONU */
+    .exclamation {
+      position: fixed;
+      color: red;
+      font-size: 40px;
+      font-weight: bold;
+      user-select: none;
+      animation: blink 1s steps(1) infinite;
+      opacity: 0.8;
+      z-index: 10002;
+      text-shadow: 0 0 10px red;
     }
 
     @keyframes eyeBlink {
@@ -136,7 +163,7 @@
     const blackout = document.getElementById("blackout");
     const body = document.body;
 
-    // ASCII animasyon çerçevesi (manuel animasyon yapacağız)
+    // ASCII göz animasyonu
     const eyeFrames = [
       `
   .----.  
@@ -157,9 +184,10 @@
       asciiEye.textContent = eyeFrames[eyeFrameIndex];
       eyeFrameIndex = (eyeFrameIndex + 1) % eyeFrames.length;
     }
-    setInterval(animateEye, 2000); // 2 saniyede bir göz kırpma animasyonu
+    setInterval(animateEye, 2000);
 
-    const lines = [
+    // Temel başlangıç satırları (örnek)
+    const baseLines = [
       "Terminal başlatılıyor...",
       "Sunucu bağlantısı kuruluyor...",
       "SSH oturumu aktif: root@192.168.66.6",
@@ -209,6 +237,16 @@
       "!!! SİSTEM ELE GEÇİRİLDİ !!!",
     ];
 
+    // 500 satır oluşturmak için baseLines tekrar edilecek
+    const totalLinesCount = 500;
+    let lines = [];
+    while (lines.length < totalLinesCount - 1) {
+      lines = lines.concat(baseLines);
+    }
+    lines = lines.slice(0, totalLinesCount - 1);
+
+    // 500. satır ERROR mesajı için boş bırakıyoruz. O özel olacak.
+
     let i = 0;
 
     function typeLineCharByChar(line, callback) {
@@ -222,11 +260,10 @@
           terminal.innerHTML += "\n";
           callback();
         }
-      }, 40); // karakter başına 40ms
+      }, 15); // karakter başı 15ms ile hızlandı
     }
 
     function shakeScreen() {
-      // Ekranı kısa süreli titret
       body.classList.add("shake");
       setTimeout(() => {
         body.classList.remove("shake");
@@ -235,14 +272,54 @@
 
     function vibrateDevice() {
       if ("vibrate" in navigator) {
-        navigator.vibrate([200, 100, 200]); // titreşim efekti
+        navigator.vibrate([200, 100, 200]);
       }
+    }
+
+    // Ekranın dört tarafından rastgele konumlandırılmış 8 adet yanıp sönen ünlem işareti
+    function createExclamation() {
+      for (let k = 0; k < 8; k++) {
+        const exclamation = document.createElement("div");
+        exclamation.classList.add("exclamation");
+        exclamation.textContent = "!!!";
+        // Konum rastgele ama ekrana yakın kenarlardan
+        const positions = [
+          {top: randomRange(10, 40) + "px", left: "10px"},
+          {top: randomRange(10, 40) + "px", right: "10px"},
+          {bottom: randomRange(10, 40) + "px", left: "10px"},
+          {bottom: randomRange(10, 40) + "px", right: "10px"},
+          {top: randomRange(60, 90) + "vh", left: "10px"},
+          {top: randomRange(60, 90) + "vh", right: "10px"},
+          {bottom: randomRange(60, 90) + "px", left: "10px"},
+          {bottom: randomRange(60, 90) + "px", right: "10px"},
+        ];
+        // Pozisyonları sırayla ata (mod k)
+        const pos = positions[k];
+        for (const prop in pos) {
+          exclamation.style[prop] = pos[prop];
+        }
+        // Küçük kaydırma animasyonu ekleyelim
+        exclamation.animate([
+          { transform: 'translateY(0)' },
+          { transform: 'translateY(-10px)' },
+          { transform: 'translateY(0)' }
+        ], {
+          duration: 1500 + Math.random() * 1000,
+          iterations: Infinity,
+          direction: "alternate",
+          easing: "ease-in-out",
+          delay: k * 200
+        });
+        body.appendChild(exclamation);
+      }
+    }
+    function randomRange(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function typeNextLine() {
       if (i < lines.length) {
         const currentLine = lines[i];
-        // Bazı satırlar için beep, titreşim ve titreme efekti
         if (
           currentLine.includes("HATA") ||
           currentLine.includes("OVERRIDE") ||
@@ -254,7 +331,7 @@
         }
         typeLineCharByChar(currentLine, () => {
           i++;
-          setTimeout(typeNextLine, 500);
+          setTimeout(typeNextLine, 50);
         });
       } else {
         showFinal();
@@ -262,20 +339,4 @@
     }
 
     function showFinal() {
-      const box = document.createElement("div");
-      box.className = "errorBox";
-      box.innerText =
-        "=== SYSTEM OVERRIDE COMPLETE ===\n!!! SİSTEM ELE GEÇİRİLDİ !!!";
-      terminal.appendChild(box);
-      cursor.style.display = "none";
-      asciiEye.style.display = "none";
-      exitBtn.style.display = "block";
-      setTimeout(() => {
-        blackout.style.opacity = 1;
-      }, 4000);
-    }
-
-    typeNextLine();
-  </script>
-</body>
-</html>
+      // Son satır
