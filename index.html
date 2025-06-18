@@ -2,17 +2,16 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8" />
-<title>Fake Hack Terminal</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Zero Day Fake Terminal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 <style>
   html, body {
     margin:0; padding:0; height:100%;
     background: black;
     overflow: hidden;
-    font-family: "Courier New", Courier, monospace;
+    font-family: 'Courier New', Courier, monospace;
     user-select: none;
   }
-
   #container {
     position: relative;
     width: 430px;
@@ -21,7 +20,6 @@
     border: 2px solid #0f0;
     background: black;
   }
-
   .terminal {
     background: black;
     color: #0f0;
@@ -33,7 +31,6 @@
     padding: 10px;
     user-select: none;
   }
-
   #bigBox {
     width: 410px;
     height: 450px;
@@ -42,7 +39,6 @@
     top: 10px;
     left: 10px;
   }
-
   .smallBox {
     width: 190px;
     height: 130px;
@@ -51,14 +47,11 @@
     overflow-y: auto;
     display: none;
   }
-
-  /* Konumlar küçük kutular için */
   #box1 { top: 470px; left: 10px; }
   #box2 { top: 470px; left: 230px; }
   #box3 { top: 610px; left: 10px; }
   #box4 { top: 610px; left: 230px; }
   #box5 { top: 750px; left: 120px; }
-
   #centerText {
     position: absolute;
     top: 50%;
@@ -77,7 +70,6 @@
     opacity: 0;
     transition: opacity 1s ease-in-out;
   }
-
   #finalOverlay {
     display: none;
     position: absolute;
@@ -88,26 +80,39 @@
     animation: flashRed 0.7s infinite;
     z-index: 2000;
   }
-
   @keyframes flashRed {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
   }
-
   .exclam {
     position: absolute;
     color: white;
     font-size: 24px;
     font-weight: bold;
-    animation: flashExclam 0.7s infinite;
+    animation: flashExclam 0.4s infinite;
     z-index: 2100;
   }
-
   @keyframes flashExclam {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
   }
-
+  /* Glitch efekt yazı */
+  .glitch {
+    color: #0f0;
+    position: relative;
+    animation: glitchAnim 1s infinite;
+  }
+  @keyframes glitchAnim {
+    0% {
+      text-shadow: 2px 0 red, -2px 0 cyan;
+    }
+    50% {
+      text-shadow: -2px 0 red, 2px 0 cyan;
+    }
+    100% {
+      text-shadow: 2px 0 red, -2px 0 cyan;
+    }
+  }
 </style>
 </head>
 <body>
@@ -119,13 +124,13 @@
   <div id="box3" class="terminal smallBox"></div>
   <div id="box4" class="terminal smallBox"></div>
   <div id="box5" class="terminal smallBox"></div>
-  <div id="centerText">@mhmtxaslan</div>
+  <div id="centerText" class="glitch">@mhmtxaslan</div>
 </div>
 
 <div id="finalOverlay"></div>
 
-<audio id="startSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-<audio id="endSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+<audio id="startSound" src="https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg" preload="auto"></audio>
+<audio id="endSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 
 <script>
   const bigBox = document.getElementById('bigBox');
@@ -136,44 +141,56 @@
     document.getElementById('box4'),
     document.getElementById('box5'),
   ];
-
   const finalOverlay = document.getElementById('finalOverlay');
   const startSound = document.getElementById('startSound');
   const endSound = document.getElementById('endSound');
   const centerText = document.getElementById('centerText');
   const container = document.getElementById('container');
+  let intervals = [];
 
-  // Yazılacak satırlar
   const lines = [
-    "Sistem taranıyor...",
-    "root erişimi sağlandı.",
-    "Dosya şifresi kırıldı.",
-    "Veriler dışa aktarılıyor...",
-    "Çekirdek belleğe yazılıyor...",
-    "AI modülü çalışıyor...",
-    "IP adresi maskeleniyor...",
-    "Firewall devre dışı...",
-    "RAM dump oluşturuldu...",
-    "Virüs yayıldı, kontrol sağlandı.",
-    "Portlar açık: 22, 80, 443",
-    "Şifreler çözüldü.",
-    "İzler siliniyor...",
-    "Kötü amaçlı yazılım yayıldı.",
-    "Yönetici hesabı ele geçirildi.",
-    "Veri tabanı şifresi çözüldü.",
-    "Sunucu durumu: kritik!",
-    "Ağ trafiği kontrol altında.",
-    "Yedekler silindi.",
-    "Sistem yeniden başlatılıyor..."
+    "SYSTEM BREACH DETECTED!",
+    "ZERO DAY EXPLOIT FOUND.",
+    "ROOT ACCESS GRANTED.",
+    "FIREWALL BYPASSED.",
+    "DATA EXFILTRATION STARTED.",
+    "ENCRYPTION KEYS CAPTURED.",
+    "BACKDOOR INSTALLED.",
+    "USER PASSWORDS LEAKED.",
+    "MALWARE DEPLOYED.",
+    "NETWORK TRAFFIC MONITORED.",
+    "ERROR: MEMORY LEAK.",
+    "WARNING: SYSTEM UNSTABLE.",
+    "ACCESS DENIED.",
+    "PROCESS TERMINATED ABNORMALLY.",
+    "SECURITY PROTOCOLS FAILED.",
+    "OVERRIDE ACTIVATED.",
+    "KERNEL PANIC IMMINENT.",
+    "PACKET LOSS DETECTED.",
+    "DISK FAILURE IMMINENT.",
+    "ZERO DAY PATCH NOT FOUND!"
   ];
 
-  // Her kutu için farklı rastgele satır seçimi
+  // Random index generator
   function getRandomLine() {
     return lines[Math.floor(Math.random() * lines.length)];
   }
 
+  // Yazdırma fonksiyonu (rastgele satırlar, arada hata satırı kırmızı)
+  function typeLines(element, speed=70) {
+    return setInterval(() => {
+      let line = getRandomLine();
+      if(line.startsWith("ERROR") || line.startsWith("WARNING")) {
+        element.innerHTML += `<span style="color:red">${line}</span>\n`;
+      } else {
+        element.innerHTML += `${line}\n`;
+      }
+      element.scrollTop = element.scrollHeight;
+    }, speed);
+  }
+
   // İlk kutu için belli sayıda satır yazdır (örneğin 10)
-  function typeFixedLines(element, lineCount=10, speed=100) {
+  function typeFixedLines(element, lineCount=10, speed=70) {
     let count = 0;
     return new Promise(resolve => {
       const interval = setInterval(() => {
@@ -182,23 +199,20 @@
           resolve();
           return;
         }
-        element.textContent += getRandomLine() + "\n";
+        let line = getRandomLine();
+        if(line.startsWith("ERROR") || line.startsWith("WARNING")) {
+          element.innerHTML += `<span style="color:red">${line}</span>\n`;
+        } else {
+          element.innerHTML += `${line}\n`;
+        }
         element.scrollTop = element.scrollHeight;
         count++;
       }, speed);
     });
   }
 
-  // Yazdırma fonksiyonu (sürekli satır yazdıran)
-  function typeLines(element, speed=90) {
-    return setInterval(() => {
-      element.textContent += getRandomLine() + "\n";
-      element.scrollTop = element.scrollHeight;
-    }, speed);
-  }
-
   // Ünlem işaretlerini rastgele yerlere yerleştir
-  function createExclamations(count=60) {
+  function createExclamations(count=80) {
     for(let i=0; i<count; i++) {
       const ex = document.createElement('div');
       ex.classList.add('exclam');
@@ -211,15 +225,13 @@
 
   // Final ekran efektleri
   function showFinal() {
-    // Tüm yazdırma intervallerini temizle
     intervals.forEach(clearInterval);
-
+    intervals = [];
     finalOverlay.style.display = 'block';
     createExclamations();
     endSound.play();
   }
 
-  // Başlangıçta ses oynatma
   async function playStartSound() {
     try {
       await startSound.play();
@@ -228,21 +240,17 @@
     }
   }
 
-  const intervals = [];
-
   async function run() {
     await playStartSound();
 
-    // İlk kutu sabit satırlarla yazsın, bitince diğer kutular açılıp yazsın
-    await typeFixedLines(bigBox, 10, 90);
-
-    // Ortadaki yazı görünür olsun
+    // İlk kutu yazsın 10 satır
+    await typeFixedLines(bigBox, 10, 60);
     centerText.style.opacity = 1;
 
-    // Diğer kutuları sırayla göster ve yazdır
+    // Küçük kutuları sırayla aç ve yazdır
     for(let i=0; i<smallBoxes.length; i++) {
       smallBoxes[i].style.display = 'block';
-      intervals.push(typeLines(smallBoxes[i], 120));
+      intervals.push(typeLines(smallBoxes[i], 60));
       await new Promise(r => setTimeout(r, 1000));
     }
 
@@ -252,10 +260,9 @@
     }, 30000);
   }
 
-  // Küçük kutuları başlangıçta gizle
   smallBoxes.forEach(box => box.style.display = 'none');
-
   run();
+
 </script>
 
 </body>
