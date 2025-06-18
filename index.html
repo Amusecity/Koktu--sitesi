@@ -18,6 +18,8 @@
     height: 90vh;
     overflow-y: auto;
     padding-right: 10px;
+    line-height: 1.2em;
+    letter-spacing: 1px;
   }
   #cursor {
     display: inline-block;
@@ -36,16 +38,16 @@
     background: red;
     color: white;
     font-weight: bold;
-    font-size: 48px;
+    font-size: 64px;
     padding: 40px 80px;
     border: 4px solid white;
-    box-shadow: 0 0 30px red;
+    box-shadow: 0 0 40px red;
     animation: blink 0.6s steps(1) infinite;
     user-select: none;
     z-index: 1000;
-    letter-spacing: 10px;
-    display: none;
+    letter-spacing: 14px;
     text-align: center;
+    display: none;
   }
   #exitBtn {
     position: fixed;
@@ -67,10 +69,10 @@
     position: fixed;
     color: red;
     font-weight: bold;
-    font-size: 40px;
+    font-size: 48px;
     user-select: none;
-    animation: blink 1s steps(1) infinite;
-    text-shadow: 0 0 8px red;
+    animation: blink 0.6s steps(1) infinite;
+    text-shadow: 0 0 10px red;
     z-index: 999;
   }
 </style>
@@ -86,7 +88,6 @@
   const errorBox = document.getElementById('errorBox');
   const exitBtn = document.getElementById('exitBtn');
 
-  // Örnek satırlar, 20 farklı satır hazırlayıp 500'e tamamlayacağız
   const exampleLines = [
     "Bağlantı kuruluyor...",
     "Kullanıcı doğrulanıyor...",
@@ -126,7 +127,7 @@
         terminal.innerText += line.charAt(charIndex);
         charIndex++;
         terminal.scrollTop = terminal.scrollHeight;
-        setTimeout(typeChar, 15); // 15ms per char
+        setTimeout(typeChar, 8); // 8ms per char: daha hızlı
       } else {
         terminal.innerText += '\n';
         done();
@@ -135,38 +136,42 @@
     typeChar();
   }
 
-  function createExclamationMark(x, y) {
+  // 4 köşeye ve ortaların kenarlarına ünlem işaretleri (aynı animasyonlu)
+  const positions = [
+    {x: 20, y: 20},
+    {x: window.innerWidth - 100, y: 20},
+    {x: 20, y: window.innerHeight - 80},
+    {x: window.innerWidth - 100, y: window.innerHeight - 80},
+    {x: window.innerWidth/2 - 40, y: 20},
+    {x: window.innerWidth/2 - 40, y: window.innerHeight - 80},
+    {x: 20, y: window.innerHeight/2 - 40},
+    {x: window.innerWidth - 100, y: window.innerHeight/2 - 40}
+  ];
+
+  let exclamations = [];
+
+  function createExclamationMark(x, y){
     const e = document.createElement('div');
     e.className = 'exclamation';
     e.innerText = '!!!';
     e.style.left = x + 'px';
     e.style.top = y + 'px';
     document.body.appendChild(e);
+    exclamations.push(e);
   }
 
-  // Ekranın kenarlarından 8 tane ünlem işareti koyuyoruz
-  function placeExclamations() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const margin = 20;
-    createExclamationMark(margin, margin);
-    createExclamationMark(w - 80, margin);
-    createExclamationMark(margin, h - 80);
-    createExclamationMark(w - 80, h - 80);
-    createExclamationMark(w / 2 - 20, margin);
-    createExclamationMark(w / 2 - 20, h - 80);
-    createExclamationMark(margin, h / 2 - 20);
-    createExclamationMark(w - 80, h / 2 - 20);
+  function placeExclamations(){
+    positions.forEach(p => createExclamationMark(p.x, p.y));
   }
 
-  function startTyping() {
+  function startTyping(){
     if(currentLine < lines.length){
       typeLine(lines[currentLine], () => {
         currentLine++;
-        setTimeout(startTyping, 20);
+        setTimeout(startTyping, 5); // satırlar arası çok kısa bekleme
       });
     } else {
-      // Son satır ERROR yazısı göster
+      // Son satır ERROR kutusunu ve ünlem işaretlerini göster
       errorBox.style.display = 'block';
       exitBtn.style.display = 'block';
       cursor.style.display = 'none';
