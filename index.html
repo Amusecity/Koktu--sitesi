@@ -1,187 +1,171 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hack Terminal Şakası</title>
-<style>
-  body {
-    margin: 0; padding: 10px;
-    background: black;
-    color: #00ff00;
-    font-family: monospace;
-    overflow: hidden;
-    user-select: none;
-  }
-  #terminal {
-    white-space: pre-wrap;
-    height: 90vh;
-    overflow-y: auto;
-    padding-right: 10px;
-    line-height: 1.2em;
-    letter-spacing: 1px;
-  }
-  #cursor {
-    display: inline-block;
-    width: 10px; height: 20px;
-    background: #00ff00;
-    animation: blink 1s steps(1) infinite;
-    vertical-align: bottom;
-  }
-  @keyframes blink {
-    50% { opacity: 0; }
-  }
-  .errorBox {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: red;
-    color: white;
-    font-weight: bold;
-    font-size: 64px;
-    padding: 40px 80px;
-    border: 4px solid white;
-    box-shadow: 0 0 40px red;
-    animation: blink 0.6s steps(1) infinite;
-    user-select: none;
-    z-index: 1000;
-    letter-spacing: 14px;
-    text-align: center;
-    display: none;
-  }
-  #exitBtn {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: darkred;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    font-size: 20px;
-    cursor: pointer;
-    user-select: none;
-    display: none;
-    z-index: 1001;
-    border-radius: 5px;
-  }
-  .exclamation {
-    position: fixed;
-    color: red;
-    font-weight: bold;
-    font-size: 48px;
-    user-select: none;
-    animation: blink 0.6s steps(1) infinite;
-    text-shadow: 0 0 10px red;
-    z-index: 999;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>HACKLENDİN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: black;
+      color: #00ff00;
+      font-family: monospace;
+      overflow: hidden;
+    }
+    #terminal {
+      padding: 10px;
+      height: 100vh;
+      white-space: pre-wrap;
+      overflow-y: auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 5px;
+      padding: 10px;
+      height: 100vh;
+      width: 100vw;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+    }
+    .box {
+      padding: 10px;
+      font-size: 12px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+    .green { background: black; color: #00ff00; }
+    .red { background: #300; color: #ff4444; }
+    .white { background: #eee; color: #111; }
+    .black { background: #111; color: #fff; }
+    #finalScreen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      color: red;
+      text-align: center;
+      font-family: monospace;
+      z-index: 9999;
+    }
+    #finalScreen h1 {
+      font-size: 48px;
+      margin-top: 30vh;
+      animation: blink 0.6s infinite steps(1);
+    }
+    #mask {
+      font-size: 80px;
+      color: white;
+      margin-top: 30px;
+      animation: blink 0.8s infinite steps(1);
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
 </head>
 <body>
-<div id="terminal"></div><span id="cursor"></span>
-<div class="errorBox" id="errorBox">ERROR</div>
-<button id="exitBtn">Çıkış</button>
+  <div id="terminal"></div>
 
-<script>
-  const terminal = document.getElementById('terminal');
-  const cursor = document.getElementById('cursor');
-  const errorBox = document.getElementById('errorBox');
-  const exitBtn = document.getElementById('exitBtn');
+  <div class="grid" id="grid">
+    <div class="box green" id="box1"></div>
+    <div class="box red" id="box2"></div>
+    <div class="box white" id="box3"></div>
+    <div class="box black" id="box4"></div>
+  </div>
 
-  const exampleLines = [
-    "Bağlantı kuruluyor...",
-    "Kullanıcı doğrulanıyor...",
-    "Sunucuya erişiliyor...",
-    "Dosyalar taranıyor...",
-    "Yazılım modülleri yükleniyor...",
-    "Güvenlik duvarı devre dışı bırakılıyor...",
-    "Veri şifrelemesi çözümleniyor...",
-    "Sistem kaynakları kontrol ediliyor...",
-    "AI modülü aktif...",
-    "Yönetici erişimi sağlandı...",
-    "Kritik hata tespit edildi...",
-    "Sistem kararsız durumda...",
-    "İşlemci kullanım oranı %98...",
-    "RAM kullanım oranı %90...",
-    "Disk erişim hatası oluştu...",
-    "Yedekleme noktası siliniyor...",
-    "Ağ trafiği yoğun...",
-    "Firewall devre dışı bırakıldı...",
-    "Root erişimi alındı...",
-    "Sistem yeniden başlatılıyor..."
-  ];
+  <div id="finalScreen">
+    <h1>!!! HACKLENDİN !!!</h1>
+    <div id="mask">
+      (͡° ͜ʖ ͡°)
+    </div>
+  </div>
 
-  // 500 satıra tamamlamak için repeat ediyoruz
-  let lines = [];
-  while(lines.length < 499) {
-    lines = lines.concat(exampleLines);
-  }
-  lines = lines.slice(0, 499);
+  <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
-  let currentLine = 0;
+  <script>
+    const terminal = document.getElementById('terminal');
+    const grid = document.getElementById('grid');
+    const boxes = [
+      document.getElementById('box1'),
+      document.getElementById('box2'),
+      document.getElementById('box3'),
+      document.getElementById('box4')
+    ];
+    const finalScreen = document.getElementById('finalScreen');
+    const beep = document.getElementById('beep');
 
-  function typeLine(line, done) {
-    let charIndex = 0;
-    function typeChar() {
-      if(charIndex < line.length){
-        terminal.innerText += line.charAt(charIndex);
-        charIndex++;
+    const firstLines = [
+      "Terminal başlatılıyor...",
+      "Güvenlik protokolü atlanıyor...",
+      "Yönetici erişimi alındı...",
+      "Ana sistem taranıyor...",
+      "Kritik modüller analiz ediliyor...",
+      "Veritabanı açılıyor...",
+      "Bağlantı noktaları taranıyor...",
+      "Zararlı kod enjekte edildi...",
+      "Sunucu kilitleniyor...",
+      "Sistem savunması çöktü."
+    ];
+
+    const fakeData = [
+      "Kod çalışıyor...",
+      "root erişimi: granted",
+      "Dosyalar siliniyor...",
+      "Sistem kaynakları izleniyor...",
+      "Port 443 açık, sızılıyor...",
+      "Şifreler ele geçirildi...",
+      "Kernel belleği yazılıyor...",
+      "Log dosyaları değiştirildi...",
+      "Firewall baypas edildi...",
+      "Komut dosyası çalıştırılıyor..."
+    ];
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function startSequence() {
+      beep.play();
+      for (let i = 0; i < firstLines.length; i++) {
+        terminal.innerText += firstLines[i] + "\n";
         terminal.scrollTop = terminal.scrollHeight;
-        setTimeout(typeChar, 8); // 8ms per char: daha hızlı
-      } else {
-        terminal.innerText += '\n';
-        done();
+        await delay(500);
       }
+
+      grid.style.display = 'grid';
+
+      const totalLines = 200;
+      let interval = 30 * 1000 / (totalLines + firstLines.length); // ~60ms
+
+      let counts = [0, 0, 0, 0];
+      let i = 0;
+      let intervalID = setInterval(() => {
+        const b = i % 4;
+        const line = fakeData[Math.floor(Math.random() * fakeData.length)];
+        boxes[b].innerText += line + "\n";
+        boxes[b].scrollTop = boxes[b].scrollHeight;
+        counts[b]++;
+        if (++i >= totalLines) {
+          clearInterval(intervalID);
+          setTimeout(showFinal, 1000);
+        }
+      }, interval);
     }
-    typeChar();
-  }
 
-  // 4 köşeye ve ortaların kenarlarına ünlem işaretleri (aynı animasyonlu)
-  const positions = [
-    {x: 20, y: 20},
-    {x: window.innerWidth - 100, y: 20},
-    {x: 20, y: window.innerHeight - 80},
-    {x: window.innerWidth - 100, y: window.innerHeight - 80},
-    {x: window.innerWidth/2 - 40, y: 20},
-    {x: window.innerWidth/2 - 40, y: window.innerHeight - 80},
-    {x: 20, y: window.innerHeight/2 - 40},
-    {x: window.innerWidth - 100, y: window.innerHeight/2 - 40}
-  ];
-
-  let exclamations = [];
-
-  function createExclamationMark(x, y){
-    const e = document.createElement('div');
-    e.className = 'exclamation';
-    e.innerText = '!!!';
-    e.style.left = x + 'px';
-    e.style.top = y + 'px';
-    document.body.appendChild(e);
-    exclamations.push(e);
-  }
-
-  function placeExclamations(){
-    positions.forEach(p => createExclamationMark(p.x, p.y));
-  }
-
-  function startTyping(){
-    if(currentLine < lines.length){
-      typeLine(lines[currentLine], () => {
-        currentLine++;
-        setTimeout(startTyping, 5); // satırlar arası çok kısa bekleme
-      });
-    } else {
-      // Son satır ERROR kutusunu ve ünlem işaretlerini göster
-      errorBox.style.display = 'block';
-      exitBtn.style.display = 'block';
-      cursor.style.display = 'none';
-      placeExclamations();
+    function showFinal() {
+      finalScreen.style.display = 'block';
     }
-  }
 
-  exitBtn.onclick = () => location.reload();
-
-  startTyping();
-</script>
+    window.onload = startSequence;
+  </script>
 </body>
 </html>
