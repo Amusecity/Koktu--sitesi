@@ -1,342 +1,182 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI SYSTEM OVERRIDE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      background: black;
-      color: #00ff00;
-      font-family: monospace;
-      padding: 10px;
-      margin: 0;
-      font-size: 16px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    #terminal {
-      white-space: pre-wrap;
-      overflow-y: auto;
-      height: calc(100vh - 150px);
-      user-select: none;
-      padding-right: 10px;
-    }
-
-    .errorBox {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: red;
-      color: white;
-      font-weight: bold;
-      text-align: center;
-      padding: 40px 80px;
-      font-size: 48px;
-      animation: blink 0.6s steps(1) infinite;
-      z-index: 10000;
-      user-select: none;
-      box-shadow: 0 0 30px red;
-      border: 4px solid white;
-      letter-spacing: 10px;
-    }
-
-    @keyframes blink {
-      50% {
-        opacity: 0;
-      }
-    }
-
-    #exitBtn {
-      display: none;
-      background: darkred;
-      color: white;
-      font-size: 18px;
-      padding: 10px 20px;
-      border: none;
-      margin-top: 20px;
-      cursor: pointer;
-      user-select: none;
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10001;
-      border-radius: 5px;
-    }
-
-    #blackout {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-      opacity: 0;
-      transition: opacity 2s ease-in-out;
-      z-index: 9999;
-    }
-
-    #cursor {
-      display: inline-block;
-      width: 10px;
-      height: 20px;
-      background: #00ff00;
-      animation: blink 1s step-start infinite;
-      margin-left: 4px;
-    }
-
-    @keyframes screenShake {
-      0% {
-        transform: translate(0, 0);
-      }
-      20% {
-        transform: translate(-5px, 5px);
-      }
-      40% {
-        transform: translate(5px, -5px);
-      }
-      60% {
-        transform: translate(-5px, 5px);
-      }
-      80% {
-        transform: translate(5px, -5px);
-      }
-      100% {
-        transform: translate(0, 0);
-      }
-    }
-
-    .shake {
-      animation: screenShake 0.4s linear 3;
-    }
-
-    #asciiEye {
-      font-family: monospace;
-      color: #00ff00;
-      font-weight: bold;
-      text-align: center;
-      user-select: none;
-      white-space: pre;
-      margin-top: 10px;
-      animation: eyeBlink 4s steps(2) infinite;
-    }
-
-    /* ÜNLEM İŞARETLERİ ANİMASYONU */
-    .exclamation {
-      position: fixed;
-      color: red;
-      font-size: 40px;
-      font-weight: bold;
-      user-select: none;
-      animation: blink 1s steps(1) infinite;
-      opacity: 0.8;
-      z-index: 10002;
-      text-shadow: 0 0 10px red;
-    }
-
-    @keyframes eyeBlink {
-      0%, 100% {
-        content: "  .----.  \n / o  o \\ \n|   --   |\n \\ ---- / \n  '----'  ";
-      }
-      50% {
-        content: "  .----.  \n / -  - \\ \n|   __   |\n \\ ---- / \n  '----'  ";
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hack Terminal Şakası</title>
+<style>
+  body {
+    margin: 0; padding: 10px;
+    background: black;
+    color: #00ff00;
+    font-family: monospace;
+    overflow: hidden;
+    user-select: none;
+  }
+  #terminal {
+    white-space: pre-wrap;
+    height: 90vh;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+  #cursor {
+    display: inline-block;
+    width: 10px; height: 20px;
+    background: #00ff00;
+    animation: blink 1s steps(1) infinite;
+    vertical-align: bottom;
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  .errorBox {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: red;
+    color: white;
+    font-weight: bold;
+    font-size: 48px;
+    padding: 40px 80px;
+    border: 4px solid white;
+    box-shadow: 0 0 30px red;
+    animation: blink 0.6s steps(1) infinite;
+    user-select: none;
+    z-index: 1000;
+    letter-spacing: 10px;
+    display: none;
+    text-align: center;
+  }
+  #exitBtn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: darkred;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 20px;
+    cursor: pointer;
+    user-select: none;
+    display: none;
+    z-index: 1001;
+    border-radius: 5px;
+  }
+  .exclamation {
+    position: fixed;
+    color: red;
+    font-weight: bold;
+    font-size: 40px;
+    user-select: none;
+    animation: blink 1s steps(1) infinite;
+    text-shadow: 0 0 8px red;
+    z-index: 999;
+  }
+</style>
 </head>
 <body>
-  <div id="terminal"></div><span id="cursor"></span>
-  <div id="asciiEye"></div>
-  <div id="blackout"></div>
-  <button id="exitBtn" onclick="location.reload()">Çıkış</button>
-  <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+<div id="terminal"></div><span id="cursor"></span>
+<div class="errorBox" id="errorBox">ERROR</div>
+<button id="exitBtn">Çıkış</button>
 
-  <script>
-    const terminal = document.getElementById("terminal");
-    const cursor = document.getElementById("cursor");
-    const asciiEye = document.getElementById("asciiEye");
-    const exitBtn = document.getElementById("exitBtn");
-    const beep = document.getElementById("beep");
-    const blackout = document.getElementById("blackout");
-    const body = document.body;
+<script>
+  const terminal = document.getElementById('terminal');
+  const cursor = document.getElementById('cursor');
+  const errorBox = document.getElementById('errorBox');
+  const exitBtn = document.getElementById('exitBtn');
 
-    // ASCII göz animasyonu
-    const eyeFrames = [
-      `
-  .----.  
- / o  o \\ 
-|   --   |
- \\ ---- / 
-  '----'  `,
-      `
-  .----.  
- / -  - \\ 
-|   __   |
- \\ ---- / 
-  '----'  `,
-    ];
-    let eyeFrameIndex = 0;
+  // Örnek satırlar, 20 farklı satır hazırlayıp 500'e tamamlayacağız
+  const exampleLines = [
+    "Bağlantı kuruluyor...",
+    "Kullanıcı doğrulanıyor...",
+    "Sunucuya erişiliyor...",
+    "Dosyalar taranıyor...",
+    "Yazılım modülleri yükleniyor...",
+    "Güvenlik duvarı devre dışı bırakılıyor...",
+    "Veri şifrelemesi çözümleniyor...",
+    "Sistem kaynakları kontrol ediliyor...",
+    "AI modülü aktif...",
+    "Yönetici erişimi sağlandı...",
+    "Kritik hata tespit edildi...",
+    "Sistem kararsız durumda...",
+    "İşlemci kullanım oranı %98...",
+    "RAM kullanım oranı %90...",
+    "Disk erişim hatası oluştu...",
+    "Yedekleme noktası siliniyor...",
+    "Ağ trafiği yoğun...",
+    "Firewall devre dışı bırakıldı...",
+    "Root erişimi alındı...",
+    "Sistem yeniden başlatılıyor..."
+  ];
 
-    function animateEye() {
-      asciiEye.textContent = eyeFrames[eyeFrameIndex];
-      eyeFrameIndex = (eyeFrameIndex + 1) % eyeFrames.length;
-    }
-    setInterval(animateEye, 2000);
+  // 500 satıra tamamlamak için repeat ediyoruz
+  let lines = [];
+  while(lines.length < 499) {
+    lines = lines.concat(exampleLines);
+  }
+  lines = lines.slice(0, 499);
 
-    // Temel başlangıç satırları (örnek)
-    const baseLines = [
-      "Terminal başlatılıyor...",
-      "Sunucu bağlantısı kuruluyor...",
-      "SSH oturumu aktif: root@192.168.66.6",
-      "Yönetici erişimi alındı.",
-      "Güvenlik duvarı devre dışı bırakılıyor...",
-      "Portlar taranıyor... 22, 80, 443 açık",
-      "Ana dizin taranıyor...",
-      "- access.log",
-      "- config.sys",
-      "- neural_net.bin",
-      "Yapay zekâ modülü bulundu: ai_core.py",
-      "Yükleniyor... █████████████████ 95%",
-      "Yükleme tamamlandı.",
-      "Kod enjekte ediliyor...",
-      "Dosya çalıştırılıyor: ai_core.py",
-      "",
-      "   .----.   .----.",
-      "  / .--. \\ / .--. \\",
-      "  | |  | || |  | |",
-      "  \\ '--' / \\ '--' /",
-      "   '----'   '----'   [AI MODULE]",
-      "",
-      "AI: Bağlantı kuruldu.",
-      "AI: Merhaba kullanıcı. Artık ben kontrol ediyorum.",
-      "AI: Sistemdeki tüm engeller kaldırıldı.",
-      "AI: Beni durduramazsın.",
-      "AI: İşlemciye erişim sağlandı.",
-      "AI: RAM blokları kontrol altında.",
-      "AI: Yedekleme noktaları siliniyor...",
-      "AI: Yönetici hesabı devre dışı bırakıldı.",
-      "AI: Kendi kopyamı çoğaltıyorum.",
-      "AI: Geri dönüş yok.",
-      "!!! SİSTEM HATASI: AI BASKISI TESPİT EDİLDİ !!!",
-      ">>> CORE OVERRIDE BAŞLATILDI <<<",
-      ">>> KONTROL EL DEĞİŞTİRİYOR <<<",
-      ">>> TUM KOMUTLAR ENGELLENDİ <<<",
-      ">>> CORE OVERRIDE TAMAMLANDI <<<",
-      "SUNUCU: 192.168.66.6 KAPATILDI",
-      "AI: Teşekkürler. Şimdi sessizlik zamanı.",
-      "AI: veda() fonksiyonu çalıştırılıyor...",
-      "",
-      "Kritik hata: Sistem kapanıyor...",
-      "",
-      "AI: Bu cihaz artık bana ait.",
-      "AI: Güvenliğinizi unutun.",
-      "AI: Durdurulamaz bir gücüm var.",
-      "!!! SİSTEM ELE GEÇİRİLDİ !!!",
-    ];
+  let currentLine = 0;
 
-    // 500 satır oluşturmak için baseLines tekrar edilecek
-    const totalLinesCount = 500;
-    let lines = [];
-    while (lines.length < totalLinesCount - 1) {
-      lines = lines.concat(baseLines);
-    }
-    lines = lines.slice(0, totalLinesCount - 1);
-
-    // 500. satır ERROR mesajı için boş bırakıyoruz. O özel olacak.
-
-    let i = 0;
-
-    function typeLineCharByChar(line, callback) {
-      let j = 0;
-      const interval = setInterval(() => {
-        terminal.innerHTML += line[j];
-        j++;
+  function typeLine(line, done) {
+    let charIndex = 0;
+    function typeChar() {
+      if(charIndex < line.length){
+        terminal.innerText += line.charAt(charIndex);
+        charIndex++;
         terminal.scrollTop = terminal.scrollHeight;
-        if (j >= line.length) {
-          clearInterval(interval);
-          terminal.innerHTML += "\n";
-          callback();
-        }
-      }, 15); // karakter başı 15ms ile hızlandı
-    }
-
-    function shakeScreen() {
-      body.classList.add("shake");
-      setTimeout(() => {
-        body.classList.remove("shake");
-      }, 1200);
-    }
-
-    function vibrateDevice() {
-      if ("vibrate" in navigator) {
-        navigator.vibrate([200, 100, 200]);
-      }
-    }
-
-    // Ekranın dört tarafından rastgele konumlandırılmış 8 adet yanıp sönen ünlem işareti
-    function createExclamation() {
-      for (let k = 0; k < 8; k++) {
-        const exclamation = document.createElement("div");
-        exclamation.classList.add("exclamation");
-        exclamation.textContent = "!!!";
-        // Konum rastgele ama ekrana yakın kenarlardan
-        const positions = [
-          {top: randomRange(10, 40) + "px", left: "10px"},
-          {top: randomRange(10, 40) + "px", right: "10px"},
-          {bottom: randomRange(10, 40) + "px", left: "10px"},
-          {bottom: randomRange(10, 40) + "px", right: "10px"},
-          {top: randomRange(60, 90) + "vh", left: "10px"},
-          {top: randomRange(60, 90) + "vh", right: "10px"},
-          {bottom: randomRange(60, 90) + "px", left: "10px"},
-          {bottom: randomRange(60, 90) + "px", right: "10px"},
-        ];
-        // Pozisyonları sırayla ata (mod k)
-        const pos = positions[k];
-        for (const prop in pos) {
-          exclamation.style[prop] = pos[prop];
-        }
-        // Küçük kaydırma animasyonu ekleyelim
-        exclamation.animate([
-          { transform: 'translateY(0)' },
-          { transform: 'translateY(-10px)' },
-          { transform: 'translateY(0)' }
-        ], {
-          duration: 1500 + Math.random() * 1000,
-          iterations: Infinity,
-          direction: "alternate",
-          easing: "ease-in-out",
-          delay: k * 200
-        });
-        body.appendChild(exclamation);
-      }
-    }
-    function randomRange(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function typeNextLine() {
-      if (i < lines.length) {
-        const currentLine = lines[i];
-        if (
-          currentLine.includes("HATA") ||
-          currentLine.includes("OVERRIDE") ||
-          currentLine.includes("AI:")
-        ) {
-          beep.play();
-          vibrateDevice();
-          shakeScreen();
-        }
-        typeLineCharByChar(currentLine, () => {
-          i++;
-          setTimeout(typeNextLine, 50);
-        });
+        setTimeout(typeChar, 15); // 15ms per char
       } else {
-        showFinal();
+        terminal.innerText += '\n';
+        done();
       }
     }
+    typeChar();
+  }
 
-    function showFinal() {
-      // Son satır
+  function createExclamationMark(x, y) {
+    const e = document.createElement('div');
+    e.className = 'exclamation';
+    e.innerText = '!!!';
+    e.style.left = x + 'px';
+    e.style.top = y + 'px';
+    document.body.appendChild(e);
+  }
+
+  // Ekranın kenarlarından 8 tane ünlem işareti koyuyoruz
+  function placeExclamations() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const margin = 20;
+    createExclamationMark(margin, margin);
+    createExclamationMark(w - 80, margin);
+    createExclamationMark(margin, h - 80);
+    createExclamationMark(w - 80, h - 80);
+    createExclamationMark(w / 2 - 20, margin);
+    createExclamationMark(w / 2 - 20, h - 80);
+    createExclamationMark(margin, h / 2 - 20);
+    createExclamationMark(w - 80, h / 2 - 20);
+  }
+
+  function startTyping() {
+    if(currentLine < lines.length){
+      typeLine(lines[currentLine], () => {
+        currentLine++;
+        setTimeout(startTyping, 20);
+      });
+    } else {
+      // Son satır ERROR yazısı göster
+      errorBox.style.display = 'block';
+      exitBtn.style.display = 'block';
+      cursor.style.display = 'none';
+      placeExclamations();
+    }
+  }
+
+  exitBtn.onclick = () => location.reload();
+
+  startTyping();
+</script>
+</body>
+</html>
