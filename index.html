@@ -1,70 +1,71 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>ERROR</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-      font-family: monospace;
-    }
-    .box {
-      position: absolute;
-      width: 30vw;
-      height: 30vh;
-      padding: 8px;
-      font-size: 12px;
-      overflow: hidden;
-      white-space: pre-wrap;
-      border: 1px solid #444;
-      box-shadow: 0 0 10px rgba(0,255,0,0.3);
-    }
-    .green { background: black; color: #00ff00; }
-    .red { background: #200; color: #ff4444; }
-    .white { background: #eee; color: #111; }
-    .blue { background: #001122; color: #33aaff; }
-    .black { background: #111; color: #fff; }
+<meta charset="UTF-8" />
+<title>ERROR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+    font-family: monospace;
+  }
+  .box {
+    position: absolute;
+    width: 28vw;
+    height: 32vh;
+    padding: 8px;
+    font-size: 12px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    border: 1px solid #444;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+  }
+  .red { background: black; color: #ff3333; box-shadow: 0 0 12px #ff0000; border-color: #ff0000;}
+  .black { background: #111; color: #eee; box-shadow: 0 0 10px #222; border-color: #222; }
+  .white { background: #eee; color: #111; box-shadow: 0 0 10px #aaa; border-color: #aaa; }
 
-    #final {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: black;
-      color: red;
-      font-size: 64px;
-      text-align: center;
-      line-height: 100vh;
-      font-weight: bold;
-      animation: blink 0.5s infinite steps(1);
-      z-index: 999;
-    }
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
+  #finalOverlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: red;
+    animation: flashRed 0.7s infinite;
+    z-index: 9999;
+  }
 
-    .exclam {
-      position: absolute;
-      color: red;
-      font-size: 24px;
-      animation: blink 0.5s infinite steps(1);
-      z-index: 998;
-    }
-  </style>
+  @keyframes flashRed {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .exclam {
+    position: fixed;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    animation: flashExclam 0.7s infinite;
+    z-index: 10000;
+  }
+
+  @keyframes flashExclam {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>
 </head>
 <body>
 
-<div id="final">!!! ERROR !!!</div>
+<div id="finalOverlay"></div>
 
 <audio id="startBeep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 <audio id="endBeep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
 <script>
-  const colors = ['green', 'red', 'white', 'blue', 'black'];
+  const colors = ['red', 'black', 'white'];
   const lines = [
     "Sistem taranıyor...",
     "root erişimi sağlandı.",
@@ -79,25 +80,42 @@
   ];
 
   const boxes = [];
-  let intervals = [];
+  const intervals = [];
 
   const startBeep = document.getElementById("startBeep");
   const endBeep = document.getElementById("endBeep");
+  const finalOverlay = document.getElementById("finalOverlay");
 
   function createBox(i) {
     const box = document.createElement("div");
-    box.className = `box ${colors[i % colors.length]}`;
+    const color = colors[i % colors.length];
+    box.className = `box ${color}`;
 
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const x = Math.random() * (vw - vw * 0.3);
-    const y = Math.random() * (vh - vh * 0.3);
+
+    // Daha dağınık konum, ekranın dört yanına yayılmış
+    let x, y;
+    if(i % 4 === 0){
+      x = Math.random() * (vw * 0.3);
+      y = Math.random() * (vh * 0.7);
+    } else if(i % 4 === 1){
+      x = vw * 0.7 + Math.random() * (vw * 0.3);
+      y = Math.random() * (vh * 0.7);
+    } else if(i % 4 === 2){
+      x = Math.random() * (vw * 0.7);
+      y = vh * 0.7 + Math.random() * (vh * 0.3);
+    } else {
+      x = vw * 0.7 + Math.random() * (vw * 0.3);
+      y = vh * 0.7 + Math.random() * (vh * 0.3);
+    }
 
     box.style.left = `${x}px`;
     box.style.top = `${y}px`;
 
     document.body.appendChild(box);
     boxes.push(box);
+
     fillBox(box);
   }
 
@@ -108,24 +126,25 @@
       box.innerText += line + "\n";
       box.scrollTop = box.scrollHeight;
       count++;
-      if (count > 50) clearInterval(interval);
+      if (count >= 50) clearInterval(interval);
     }, 60);
     intervals.push(interval);
   }
 
   function showExclamation() {
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 50; i++) {
       const span = document.createElement("div");
       span.className = "exclam";
       span.innerText = "!";
-      span.style.left = Math.random() * 100 + "vw";
-      span.style.top = Math.random() * 100 + "vh";
+      span.style.left = Math.random() * window.innerWidth + "px";
+      span.style.top = Math.random() * window.innerHeight + "px";
       document.body.appendChild(span);
     }
   }
 
   function showFinal() {
-    document.getElementById("final").style.display = "block";
+    intervals.forEach(clearInterval);
+    finalOverlay.style.display = "block";
     showExclamation();
     endBeep.play();
   }
@@ -133,14 +152,14 @@
   async function run() {
     startBeep.play();
 
-    for (let i = 0; i < 12; i++) {
+    // 5 kutu sırayla 1 saniye arayla açılıyor
+    for (let i = 0; i < 5; i++) {
       createBox(i);
-      await new Promise(r => setTimeout(r, 1000)); // Kutular 1 saniye arayla geliyor
+      await new Promise(r => setTimeout(r, 1000));
     }
 
-    // Toplam süre 30 saniye olacak şekilde finali göster
+    // 30 saniyede finali göster
     setTimeout(() => {
-      intervals.forEach(clearInterval); // Yazıları durdur
       showFinal();
     }, 30000);
   }
