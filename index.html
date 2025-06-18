@@ -14,18 +14,20 @@
     .box {
       position: absolute;
       width: 30vw;
-      height: 25vh;
+      height: 30vh;
       padding: 8px;
-      font-size: 11px;
-      overflow: auto;
+      font-size: 12px;
+      overflow: hidden;
       white-space: pre-wrap;
+      border: 1px solid #444;
       box-shadow: 0 0 10px rgba(0,255,0,0.3);
     }
     .green { background: black; color: #00ff00; }
-    .red { background: #300; color: #ff5555; }
+    .red { background: #200; color: #ff4444; }
     .white { background: #eee; color: #111; }
-    .blue { background: #001133; color: #33aaff; }
+    .blue { background: #001122; color: #33aaff; }
     .black { background: #111; color: #fff; }
+
     #final {
       display: none;
       position: fixed;
@@ -38,16 +40,17 @@
       text-align: center;
       line-height: 100vh;
       font-weight: bold;
-      animation: blink 0.6s infinite steps(1);
+      animation: blink 0.5s infinite steps(1);
       z-index: 999;
     }
     @keyframes blink {
       50% { opacity: 0; }
     }
+
     .exclam {
       position: absolute;
       color: red;
-      font-size: 32px;
+      font-size: 24px;
       animation: blink 0.5s infinite steps(1);
       z-index: 998;
     }
@@ -63,29 +66,36 @@
 <script>
   const colors = ['green', 'red', 'white', 'blue', 'black'];
   const lines = [
-    "Sistem çözümleniyor...",
-    "root erişimi: granted",
-    "Dosyalar siliniyor...",
-    "Port 443 açık...",
-    "Firewall baypas edildi...",
-    "Zararlı kod enjekte edildi...",
-    "Şifreler ele geçirildi...",
-    "RAM taranıyor...",
-    "Çekirdek kontrol altına alındı...",
-    "Ana işlemci yazılıyor...",
+    "Sistem taranıyor...",
+    "root erişimi sağlandı.",
+    "Dosya şifresi kırıldı.",
+    "Veriler dışa aktarılıyor...",
+    "Çekirdek belleğe yazılıyor...",
+    "AI modülü çalışıyor...",
+    "IP adresi maskeleniyor...",
+    "Firewall devre dışı...",
+    "RAM dump oluşturuldu...",
+    "Virüs yayıldı, kontrol sağlandı.",
   ];
 
   const boxes = [];
+  let intervals = [];
+
   const startBeep = document.getElementById("startBeep");
   const endBeep = document.getElementById("endBeep");
 
   function createBox(i) {
     const box = document.createElement("div");
     box.className = `box ${colors[i % colors.length]}`;
-    const x = (i % 3) * 32 + 2;
-    const y = Math.floor(i / 3) * 28 + 2;
-    box.style.left = `${x}vw`;
-    box.style.top = `${y}vh`;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const x = Math.random() * (vw - vw * 0.3);
+    const y = Math.random() * (vh - vh * 0.3);
+
+    box.style.left = `${x}px`;
+    box.style.top = `${y}px`;
+
     document.body.appendChild(box);
     boxes.push(box);
     fillBox(box);
@@ -100,10 +110,11 @@
       count++;
       if (count > 50) clearInterval(interval);
     }, 60);
+    intervals.push(interval);
   }
 
   function showExclamation() {
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 40; i++) {
       const span = document.createElement("div");
       span.className = "exclam";
       span.innerText = "!";
@@ -115,17 +126,23 @@
 
   function showFinal() {
     document.getElementById("final").style.display = "block";
-    endBeep.play();
     showExclamation();
+    endBeep.play();
   }
 
   async function run() {
     startBeep.play();
+
     for (let i = 0; i < 12; i++) {
       createBox(i);
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 1000)); // Kutular 1 saniye arayla geliyor
     }
-    setTimeout(showFinal, 3000);
+
+    // Toplam süre 30 saniye olacak şekilde finali göster
+    setTimeout(() => {
+      intervals.forEach(clearInterval); // Yazıları durdur
+      showFinal();
+    }, 30000);
   }
 
   run();
