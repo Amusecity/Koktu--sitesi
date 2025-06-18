@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8" />
-<title>Zero Day Fake Terminal</title>
+<title>Zero Day Terminal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 <style>
   html, body {
@@ -22,7 +22,6 @@
   }
   .terminal {
     background: black;
-    color: #0f0;
     border: 1px solid #0f0;
     box-shadow: 0 0 10px #0f0;
     font-family: "Courier New", Courier, monospace;
@@ -30,14 +29,16 @@
     overflow-y: auto;
     padding: 10px;
     user-select: none;
+    color: #0f0;
   }
   #bigBox {
     width: 410px;
     height: 450px;
-    font-size: 14px;
+    font-size: 12px;
     position: absolute;
     top: 10px;
     left: 10px;
+    color: #0f0;
   }
   .smallBox {
     width: 190px;
@@ -47,16 +48,17 @@
     overflow-y: auto;
     display: none;
   }
-  #box1 { top: 470px; left: 10px; }
-  #box2 { top: 470px; left: 230px; }
-  #box3 { top: 610px; left: 10px; }
-  #box4 { top: 610px; left: 230px; }
-  #box5 { top: 750px; left: 120px; }
+  #box1 { top: 470px; left: 10px; color: red; border-color: red; box-shadow: 0 0 8px red; }
+  #box2 { top: 470px; left: 230px; color: white; border-color: white; box-shadow: 0 0 8px white; }
+  #box3 { top: 610px; left: 10px; color: black; background: #222; border-color: black; box-shadow: 0 0 8px #555; }
+  #box4 { top: 610px; left: 230px; color: red; border-color: red; box-shadow: 0 0 8px red; }
+  #box5 { top: 750px; left: 120px; color: white; border-color: white; box-shadow: 0 0 8px white; }
+
   #centerText {
     position: absolute;
-    top: 50%;
+    top: 5%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     color: #0f0;
     font-weight: bold;
     font-size: 28px;
@@ -67,10 +69,10 @@
       0 0 10px #0f0,
       0 0 20px #0f0;
     z-index: 1000;
-    opacity: 0;
+    opacity: 1;
     transition: opacity 1s ease-in-out;
   }
-  #finalOverlay {
+  #errorOverlay {
     display: none;
     position: absolute;
     top:0; left:0;
@@ -79,6 +81,12 @@
     background: red;
     animation: flashRed 0.7s infinite;
     z-index: 2000;
+    color: black;
+    font-size: 64px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 932px;
+    user-select: none;
   }
   @keyframes flashRed {
     0%, 100% { opacity: 1; }
@@ -91,43 +99,44 @@
     font-weight: bold;
     animation: flashExclam 0.4s infinite;
     z-index: 2100;
+    user-select: none;
   }
   @keyframes flashExclam {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
   }
-  /* Glitch efekt yazı */
-  .glitch {
-    color: #0f0;
-    position: relative;
-    animation: glitchAnim 1s infinite;
+  #questionMarks {
+    position: absolute;
+    width: 100%;
+    top: 70%;
+    left: 0;
+    font-size: 28px;
+    color: white;
+    text-align: center;
+    animation: moveQM 2s linear infinite;
+    user-select: none;
   }
-  @keyframes glitchAnim {
-    0% {
-      text-shadow: 2px 0 red, -2px 0 cyan;
-    }
-    50% {
-      text-shadow: -2px 0 red, 2px 0 cyan;
-    }
-    100% {
-      text-shadow: 2px 0 red, -2px 0 cyan;
-    }
+  @keyframes moveQM {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
 </style>
 </head>
 <body>
 
 <div id="container">
+  <div id="centerText">@mhmtxaslan</div>
+
   <div id="bigBox" class="terminal"></div>
   <div id="box1" class="terminal smallBox"></div>
   <div id="box2" class="terminal smallBox"></div>
   <div id="box3" class="terminal smallBox"></div>
   <div id="box4" class="terminal smallBox"></div>
   <div id="box5" class="terminal smallBox"></div>
-  <div id="centerText" class="glitch">@mhmtxaslan</div>
 </div>
 
-<div id="finalOverlay"></div>
+<div id="errorOverlay">ERROR</div>
+<div id="questionMarks">??????????????????????????????????????????????????????????????????????????????????????????</div>
 
 <audio id="startSound" src="https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg" preload="auto"></audio>
 <audio id="endSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
@@ -141,78 +150,113 @@
     document.getElementById('box4'),
     document.getElementById('box5'),
   ];
-  const finalOverlay = document.getElementById('finalOverlay');
+  const centerText = document.getElementById('centerText');
+  const errorOverlay = document.getElementById('errorOverlay');
+  const questionMarks = document.getElementById('questionMarks');
   const startSound = document.getElementById('startSound');
   const endSound = document.getElementById('endSound');
-  const centerText = document.getElementById('centerText');
-  const container = document.getElementById('container');
-  let intervals = [];
 
-  const lines = [
-    "SYSTEM BREACH DETECTED!",
-    "ZERO DAY EXPLOIT FOUND.",
-    "ROOT ACCESS GRANTED.",
-    "FIREWALL BYPASSED.",
-    "DATA EXFILTRATION STARTED.",
-    "ENCRYPTION KEYS CAPTURED.",
-    "BACKDOOR INSTALLED.",
-    "USER PASSWORDS LEAKED.",
-    "MALWARE DEPLOYED.",
-    "NETWORK TRAFFIC MONITORED.",
-    "ERROR: MEMORY LEAK.",
-    "WARNING: SYSTEM UNSTABLE.",
-    "ACCESS DENIED.",
-    "PROCESS TERMINATED ABNORMALLY.",
-    "SECURITY PROTOCOLS FAILED.",
-    "OVERRIDE ACTIVATED.",
-    "KERNEL PANIC IMMINENT.",
-    "PACKET LOSS DETECTED.",
-    "DISK FAILURE IMMINENT.",
-    "ZERO DAY PATCH NOT FOUND!"
+  // Her kutu için farklı satırlar üretmek için veri kümeleri:
+  const linesBig = [];
+  const linesRed = [
+    "ERROR: SYSTEM FAILURE",
+    "CRITICAL BREACH",
+    "ACCESS DENIED",
+    "PACKET LOSS",
+    "MALWARE DETECTED",
+    "DISK FAILURE IMMINENT",
+    "SECURITY BREACH",
+    "WARNING: MEMORY LEAK",
+    "FIREWALL OVERRIDE",
+    "BACKDOOR OPENED"
+  ];
+  const linesWhite = [
+    "USER LOGGED IN",
+    "DATA STREAMING",
+    "PROCESS RUNNING",
+    "PACKET SENT",
+    "SYSTEM UPDATE",
+    "PROCESS TERMINATED",
+    "FILE DELETED",
+    "CONNECTION LOST",
+    "NETWORK STABLE",
+    "LOG SAVED"
+  ];
+  const linesBlack = [
+    "PING SENT",
+    "PING RECEIVED",
+    "NO RESPONSE",
+    "TIMEOUT ERROR",
+    "CONNECTION RESET",
+    "RETRYING",
+    "HOST UNREACHABLE",
+    "DNS FAILURE",
+    "NETWORK DOWN",
+    "RECONNECTED"
   ];
 
-  // Random index generator
-  function getRandomLine() {
-    return lines[Math.floor(Math.random() * lines.length)];
+  // İlk kutu 500 satır için rastgele "sistem" mesajları
+  for(let i=0; i<500; i++) {
+    let rnd = Math.random();
+    if(rnd < 0.2) linesBig.push(linesRed[Math.floor(Math.random()*linesRed.length)]);
+    else if(rnd < 0.6) linesBig.push(linesWhite[Math.floor(Math.random()*linesWhite.length)]);
+    else linesBig.push(linesBlack[Math.floor(Math.random()*linesBlack.length)]);
   }
 
-  // Yazdırma fonksiyonu (rastgele satırlar, arada hata satırı kırmızı)
-  function typeLines(element, speed=70) {
-    return setInterval(() => {
-      let line = getRandomLine();
-      if(line.startsWith("ERROR") || line.startsWith("WARNING")) {
-        element.innerHTML += `<span style="color:red">${line}</span>\n`;
-      } else {
-        element.innerHTML += `${line}\n`;
-      }
-      element.scrollTop = element.scrollHeight;
-    }, speed);
+  function getRandomFrom(arr) {
+    return arr[Math.floor(Math.random()*arr.length)];
   }
 
-  // İlk kutu için belli sayıda satır yazdır (örneğin 10)
-  function typeFixedLines(element, lineCount=10, speed=70) {
-    let count = 0;
+  // Yazdırma fonksiyonu: belirli satır sayısını yazdırır sonra durur.
+  function typeFixedLines(element, lines, count, speed) {
     return new Promise(resolve => {
+      let i = 0;
       const interval = setInterval(() => {
-        if(count >= lineCount) {
+        if(i >= count) {
           clearInterval(interval);
           resolve();
           return;
         }
-        let line = getRandomLine();
-        if(line.startsWith("ERROR") || line.startsWith("WARNING")) {
-          element.innerHTML += `<span style="color:red">${line}</span>\n`;
-        } else {
-          element.innerHTML += `${line}\n`;
+        let line = lines[i];
+        // Kırmızı renkli mesajlar için özel renk
+        if(element.id === 'box1' || element.id === 'box4') {
+          element.style.color = 'red';
+          element.style.borderColor = 'red';
+          element.style.boxShadow = '0 0 8px red';
         }
+        if(element.id === 'box2' || element.id === 'box5') {
+          element.style.color = 'white';
+          element.style.borderColor = 'white';
+          element.style.boxShadow = '0 0 8px white';
+          element.style.background = 'black';
+        }
+        if(element.id === 'box3') {
+          element.style.color = 'black';
+          element.style.background = '#222';
+          element.style.borderColor = 'black';
+          element.style.boxShadow = '0 0 8px #555';
+        }
+        element.innerHTML += line + "\n";
         element.scrollTop = element.scrollHeight;
-        count++;
+        i++;
       }, speed);
     });
   }
 
-  // Ünlem işaretlerini rastgele yerlere yerleştir
-  function createExclamations(count=80) {
+  // Yazdırma fonksiyonu: sonsuz yazdırır (hızlı)
+  function typeLoopLines(element, lines, speed=60) {
+    let i = 0;
+    return setInterval(() => {
+      let line = lines[i % lines.length];
+      element.innerHTML += line + "\n";
+      element.scrollTop = element.scrollHeight;
+      i++;
+    }, speed);
+  }
+
+  // Ünlem işaretlerini rasgele yerlere yerleştir
+  function createExclamations(count=50) {
+    const container = document.getElementById('container');
     for(let i=0; i<count; i++) {
       const ex = document.createElement('div');
       ex.classList.add('exclam');
@@ -223,15 +267,7 @@
     }
   }
 
-  // Final ekran efektleri
-  function showFinal() {
-    intervals.forEach(clearInterval);
-    intervals = [];
-    finalOverlay.style.display = 'block';
-    createExclamations();
-    endSound.play();
-  }
-
+  // Başlangıç sesini oynat
   async function playStartSound() {
     try {
       await startSound.play();
@@ -240,30 +276,16 @@
     }
   }
 
-  async function run() {
-    await playStartSound();
-
-    // İlk kutu yazsın 10 satır
-    await typeFixedLines(bigBox, 10, 60);
-    centerText.style.opacity = 1;
-
-    // Küçük kutuları sırayla aç ve yazdır
-    for(let i=0; i<smallBoxes.length; i++) {
-      smallBoxes[i].style.display = 'block';
-      intervals.push(typeLines(smallBoxes[i], 60));
-      await new Promise(r => setTimeout(r, 1000));
-    }
-
-    // 30 saniye sonra final ekranı göster
-    setTimeout(() => {
-      showFinal();
-    }, 30000);
+  // Final efektleri (ERROR ve soru işaretleri)
+  function showFinal() {
+    smallBoxes.forEach(box => clearInterval(box.interval));
+    bigBoxInterval && clearInterval(bigBoxInterval);
+    errorOverlay.style.display = 'block';
+    questionMarks.style.display = 'block';
+    endSound.play();
   }
 
-  smallBoxes.forEach(box => box.style.display = 'none');
-  run();
+  let bigBoxInterval;
 
-</script>
-
-</body>
-</html>
+  async function run() {
+    await playStartSound();
