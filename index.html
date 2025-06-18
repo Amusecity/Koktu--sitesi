@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>AI SYSTEM OVERRIDE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       background: black;
@@ -14,11 +14,14 @@
       font-size: 16px;
       overflow: hidden;
     }
+
     #terminal {
       white-space: pre-wrap;
       overflow-y: auto;
-      height: 90vh;
+      height: calc(100vh - 120px);
+      user-select: none;
     }
+
     .errorBox {
       background-color: red;
       color: white;
@@ -27,10 +30,15 @@
       padding: 20px;
       animation: blink 0.6s steps(1) infinite;
       margin-top: 20px;
+      user-select: none;
     }
+
     @keyframes blink {
-      50% { opacity: 0; }
+      50% {
+        opacity: 0;
+      }
     }
+
     #exitBtn {
       display: none;
       background: darkred;
@@ -40,10 +48,13 @@
       border: none;
       margin-top: 20px;
       cursor: pointer;
+      user-select: none;
     }
+
     #blackout {
       position: fixed;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       background: black;
@@ -51,19 +62,102 @@
       transition: opacity 2s ease-in-out;
       z-index: 9999;
     }
+
+    #cursor {
+      display: inline-block;
+      width: 10px;
+      height: 20px;
+      background: #00ff00;
+      animation: blink 1s step-start infinite;
+      margin-left: 4px;
+    }
+
+    /* Ekran titremesi için animasyon */
+    @keyframes screenShake {
+      0% {
+        transform: translate(0, 0);
+      }
+      20% {
+        transform: translate(-5px, 5px);
+      }
+      40% {
+        transform: translate(5px, -5px);
+      }
+      60% {
+        transform: translate(-5px, 5px);
+      }
+      80% {
+        transform: translate(5px, -5px);
+      }
+      100% {
+        transform: translate(0, 0);
+      }
+    }
+
+    .shake {
+      animation: screenShake 0.4s linear 3;
+    }
+
+    /* ASCII animasyon göz için */
+    #asciiEye {
+      font-family: monospace;
+      color: #00ff00;
+      font-weight: bold;
+      text-align: center;
+      user-select: none;
+      white-space: pre;
+      margin-top: 10px;
+      animation: eyeBlink 4s steps(2) infinite;
+    }
+
+    @keyframes eyeBlink {
+      0%, 100% {
+        content: "  .----.  \n / o  o \\ \n|   --   |\n \\ ---- / \n  '----'  ";
+      }
+      50% {
+        content: "  .----.  \n / -  - \\ \n|   __   |\n \\ ---- / \n  '----'  ";
+      }
+    }
   </style>
 </head>
 <body>
-  <div id="terminal"></div>
+  <div id="terminal"></div><span id="cursor"></span>
+  <div id="asciiEye"></div>
   <div id="blackout"></div>
   <button id="exitBtn" onclick="location.reload()">Çıkış</button>
   <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
   <script>
     const terminal = document.getElementById("terminal");
+    const cursor = document.getElementById("cursor");
+    const asciiEye = document.getElementById("asciiEye");
     const exitBtn = document.getElementById("exitBtn");
     const beep = document.getElementById("beep");
     const blackout = document.getElementById("blackout");
+    const body = document.body;
+
+    // ASCII animasyon çerçevesi (manuel animasyon yapacağız)
+    const eyeFrames = [
+      `
+  .----.  
+ / o  o \\ 
+|   --   |
+ \\ ---- / 
+  '----'  `,
+      `
+  .----.  
+ / -  - \\ 
+|   __   |
+ \\ ---- / 
+  '----'  `,
+    ];
+    let eyeFrameIndex = 0;
+
+    function animateEye() {
+      asciiEye.textContent = eyeFrames[eyeFrameIndex];
+      eyeFrameIndex = (eyeFrameIndex + 1) % eyeFrames.length;
+    }
+    setInterval(animateEye, 2000); // 2 saniyede bir göz kırpma animasyonu
 
     const lines = [
       "Terminal başlatılıyor...",
@@ -107,21 +201,61 @@
       "AI: Teşekkürler. Şimdi sessizlik zamanı.",
       "AI: veda() fonksiyonu çalıştırılıyor...",
       "",
-      "Kritik hata: Sistem kapanıyor..."
+      "Kritik hata: Sistem kapanıyor...",
+      "",
+      "AI: Bu cihaz artık bana ait.",
+      "AI: Güvenliğinizi unutun.",
+      "AI: Durdurulamaz bir gücüm var.",
+      "!!! SİSTEM ELE GEÇİRİLDİ !!!",
     ];
 
     let i = 0;
-    function typeLine() {
-      if (i < lines.length) {
-        terminal.innerHTML += lines[i] + "\n";
+
+    function typeLineCharByChar(line, callback) {
+      let j = 0;
+      const interval = setInterval(() => {
+        terminal.innerHTML += line[j];
+        j++;
         terminal.scrollTop = terminal.scrollHeight;
-
-        if (lines[i].includes("HATA") || lines[i].includes("OVERRIDE") || lines[i].includes("AI:")) {
-          beep.play();
+        if (j >= line.length) {
+          clearInterval(interval);
+          terminal.innerHTML += "\n";
+          callback();
         }
+      }, 40); // karakter başına 40ms
+    }
 
-        i++;
-        setTimeout(typeLine, 2300); // 2.3 saniye gecikmeli
+    function shakeScreen() {
+      // Ekranı kısa süreli titret
+      body.classList.add("shake");
+      setTimeout(() => {
+        body.classList.remove("shake");
+      }, 1200);
+    }
+
+    function vibrateDevice() {
+      if ("vibrate" in navigator) {
+        navigator.vibrate([200, 100, 200]); // titreşim efekti
+      }
+    }
+
+    function typeNextLine() {
+      if (i < lines.length) {
+        const currentLine = lines[i];
+        // Bazı satırlar için beep, titreşim ve titreme efekti
+        if (
+          currentLine.includes("HATA") ||
+          currentLine.includes("OVERRIDE") ||
+          currentLine.includes("AI:")
+        ) {
+          beep.play();
+          vibrateDevice();
+          shakeScreen();
+        }
+        typeLineCharByChar(currentLine, () => {
+          i++;
+          setTimeout(typeNextLine, 500);
+        });
       } else {
         showFinal();
       }
@@ -130,16 +264,18 @@
     function showFinal() {
       const box = document.createElement("div");
       box.className = "errorBox";
-      box.innerText = "=== SYSTEM OVERRIDE COMPLETE ===";
+      box.innerText =
+        "=== SYSTEM OVERRIDE COMPLETE ===\n!!! SİSTEM ELE GEÇİRİLDİ !!!";
       terminal.appendChild(box);
+      cursor.style.display = "none";
+      asciiEye.style.display = "none";
       exitBtn.style.display = "block";
-
       setTimeout(() => {
-        blackout.style.opacity = 1; // Kapanma efekti
+        blackout.style.opacity = 1;
       }, 4000);
     }
 
-    typeLine();
+    typeNextLine();
   </script>
 </body>
 </html>
