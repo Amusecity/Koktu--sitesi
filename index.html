@@ -1,280 +1,111 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Korku Terminal Şakası</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
-  body, html {
-    margin: 0; padding: 0;
-    height: 100%;
-    background: black;
-    overflow: hidden;
-    font-family: 'Share Tech Mono', monospace;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-
-  @keyframes bgBlink {
-    0%, 100% { background-color: black; }
-    50% { background-color: #8B0000; }
-  }
-  body {
-    animation: bgBlink 1.5s infinite;
-  }
-
-  #container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 20px;
-    width: 90vw;
-    height: 90vh;
-    max-width: 1200px;
-    max-height: 800px;
-  }
-
-  .terminal-box {
-    box-sizing: border-box;
-    padding: 20px;
-    overflow-y: auto;
-    font-size: 1.3em;
-    line-height: 1.4em;
-    white-space: pre-wrap;
-    word-break: break-word;
-    border-radius: 6px;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background: black;
-    border: 3px solid;
-    box-shadow: 0 0 10px;
-  }
-
-  #box1 {
-    color: #0f0;
-    background: black;
-    border-color: #0f0;
-    box-shadow: 0 0 20px #0f0;
-  }
-
-  #box2 {
-    color: #f00;
-    background: black;
-    border-color: #f00;
-    box-shadow: 0 0 20px #f00;
-  }
-
-  #box3 {
-    color: #fff;
-    background: black;
-    border-color: #888;
-    box-shadow: 0 0 15px #888;
-  }
-
-  #box4 {
-    color: black;
-    background: white;
-    border-color: black;
-    box-shadow: 0 0 15px black;
-  }
-
-  #container > div {
-    aspect-ratio: 1 / 1;
-  }
-
-  #error-overlay {
-    position: fixed;
-    top:0; left:0; right:0; bottom:0;
-    background: rgba(0,0,0,0.95);
-    color: #f00;
-    font-size: 10em;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-shadow: 0 0 40px #f00;
-    visibility: hidden;
-    animation: blink 1s infinite;
-    z-index: 10000;
-  }
-
-  @keyframes blink {
-    0%, 100% {opacity: 1;}
-    50% {opacity: 0;}
-  }
-
-  #startBtn {
-    margin-top: 20px;
-    padding: 15px 40px;
-    font-size: 1.5em;
-    background: #0f0;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    color: black;
-    font-weight: bold;
-    user-select: none;
-    transition: background 0.3s;
-  }
-
-  #startBtn:hover {
-    background: #0a0;
-  }
-
-  #exclamations {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    pointer-events: none;
-    overflow: visible;
-    z-index: 9999;
-  }
-
-  .exclamation {
-    position: absolute;
-    color: #f00;
-    font-size: 3em;
-    font-weight: bold;
-    text-shadow: 0 0 10px #f00;
-    animation: blinkExclamation 1.2s infinite;
-    user-select: none;
-  }
-
-  @keyframes blinkExclamation {
-    0%, 100% {opacity: 1;}
-    50% {opacity: 0;}
-  }
-
-</style>
+  <meta charset="UTF-8">
+  <title>Terminal Hack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: black;
+      color: #33ff33;
+      font-family: monospace;
+      font-size: 16px;
+      margin: 0;
+      padding: 10px;
+      overflow: hidden;
+    }
+    #terminal {
+      white-space: pre-wrap;
+      overflow-y: auto;
+      height: 90vh;
+    }
+    .errorBox {
+      background-color: red;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      padding: 20px;
+      animation: blink 0.5s steps(1) infinite;
+      margin-top: 20px;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    #exitBtn {
+      display: none;
+      background: #ff3333;
+      color: white;
+      border: none;
+      font-size: 20px;
+      padding: 10px 20px;
+      margin-top: 30px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+  <div id="terminal"></div>
+  <button id="exitBtn" onclick="location.reload()">Çıkış</button>
+  <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
-<button id="startBtn">Çıkış</button>
+  <script>
+    const terminal = document.getElementById("terminal");
+    const exitBtn = document.getElementById("exitBtn");
+    const beep = document.getElementById("beep");
 
-<div id="container" style="display:none;">
-  <div id="box1" class="terminal-box"></div>
-  <div id="box2" class="terminal-box"></div>
-  <div id="box3" class="terminal-box"></div>
-  <div id="box4" class="terminal-box"></div>
-</div>
+    const lines = [
+      "Initializing cyber attack interface...",
+      "[+] Connecting to target server...",
+      "  > Handshake 1 successful.",
+      "  > Handshake 2 successful.",
+      "  > Handshake 3 successful.",
+      "[+] Injecting remote access payload...",
+      "[+] Breaking encryption: ███████████████████████████████",
+      "[+] Encryption bypassed.",
+      "",
+      "        .-'      '-.",
+      "       /            \\",
+      "      |              |",
+      "       \\            /",
+      "        '-.______.-'",
+      "",
+      "!!! GÜVENLİK DUVARI AŞILDI !!!",
+      "[!] Dumping critical data...",
+      "  > exfil_01.secret.bin",
+      "  > exfil_02.secret.bin",
+      "  > exfil_03.secret.bin",
+      "!!! SYSTEM ERROR DETECTED !!!",
+      "[x] HEDEF SUNUCU ÇÖKERTİLDİ"
+    ];
 
-<div id="error-overlay">ERROR</div>
-<div id="exclamations"></div>
+    let index = 0;
 
-<script>
-  const startBtn = document.getElementById('startBtn');
-  const container = document.getElementById('container');
-  const errorOverlay = document.getElementById('error-overlay');
-  const exclamationsContainer = document.getElementById('exclamations');
+    function writeLine() {
+      if (index < lines.length) {
+        terminal.innerHTML += lines[index] + "\n";
+        terminal.scrollTop = terminal.scrollHeight;
 
-  const messages = [];
-  for(let i=0; i<2000; i++) {
-    messages.push(
-      `[${i+1}] Virüs yükleniyor... Sistem çökmeye hazır!\n` +
-      `IP adresi tespit edildi: 192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}\n` +
-      `Kişisel veriler siliniyor...\n` +
-      `Hesap içi veriler ele geçirildi.\n` +
-      `Sistem güvenliği yok!\n\n`
-    );
-  }
+        // bip sesi tetikle
+        if (lines[index].includes("ERROR") || lines[index].includes("ÇÖKERTİLDİ")) {
+          beep.play();
+        }
 
-  const boxes = [
-    document.getElementById('box1'),
-    document.getElementById('box2'),
-    document.getElementById('box3'),
-    document.getElementById('box4')
-  ];
-
-  let currentMsgIndex = [0,0,0,0];
-  const maxLines = 1000;
-
-  function typeMessage(boxIndex, message, callback) {
-    const box = boxes[boxIndex];
-    let i = 0;
-    function typeChar() {
-      if(i < message.length) {
-        box.textContent += message.charAt(i);
-        i++;
-        setTimeout(typeChar, 25);
+        index++;
+        setTimeout(writeLine, 500);
       } else {
-        callback();
+        showErrorBox();
       }
     }
-    typeChar();
-  }
 
-  function writeNextLine(boxIndex) {
-    if(currentMsgIndex[boxIndex] >= maxLines) return;
-    const message = messages[currentMsgIndex[boxIndex]];
-    typeMessage(boxIndex, message, () => {
-      currentMsgIndex[boxIndex]++;
-      writeNextLine(boxIndex);
-    });
-  }
-
-  function createExclamations() {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const count = 30;
-    for(let i=0; i<count; i++) {
-      const exclamation = document.createElement('div');
-      exclamation.classList.add('exclamation');
-      exclamation.textContent = '!';
-      let posX, posY;
-      const side = Math.floor(Math.random() * 4);
-      switch(side){
-        case 0:
-          posX = Math.random() * vw;
-          posY = Math.random() * 50;
-          break;
-        case 1:
-          posX = Math.random() * vw;
-          posY = vh - (Math.random() * 50);
-          break;
-        case 2:
-          posX = Math.random() * 50;
-          posY = Math.random() * vh;
-          break;
-        case 3:
-          posX = vw - (Math.random() * 50);
-          posY = Math.random() * vh;
-          break;
-      }
-      exclamation.style.left = posX + 'px';
-      exclamation.style.top = posY + 'px';
-      exclamation.style.animationDelay = (Math.random()*1.5) + 's';
-      exclamationsContainer.appendChild(exclamation);
+    function showErrorBox() {
+      const box = document.createElement("div");
+      box.className = "errorBox";
+      box.innerText = "=== SYSTEM ERROR ===";
+      terminal.appendChild(box);
+      exitBtn.style.display = "block";
     }
-  }
 
-  function showError() {
-    errorOverlay.style.visibility = 'visible';
-    createExclamations();
-  }
-
-  startBtn.addEventListener('click', () => {
-    startBtn.style.display = 'none';
-    container.style.display = 'grid';
-
-    writeNextLine(0);
-
-    // 5 saniyede bir diğer kutuları sırayla başlat
-    setTimeout(() => writeNextLine(1), 5000);
-    setTimeout(() => writeNextLine(2), 10000);
-    setTimeout(() => writeNextLine(3), 15000);
-
-    // 20 saniye sonra ERROR göster
-    setTimeout(() => {
-      showError();
-    }, 20000);
-  });
-</script>
-
+    writeLine();
+  </script>
 </body>
 </html>
